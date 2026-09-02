@@ -20,6 +20,8 @@ const searchInput  = document.getElementById('game-search');
 const searchEmpty  = document.getElementById('search-empty');
 const menuToggle   = document.getElementById('menu-toggle');
 const categoryMenu = document.getElementById('category-menu');
+const drawerBackdrop = document.getElementById('drawer-backdrop');
+const drawerClose   = document.getElementById('drawer-close');
 const htmlEl       = document.documentElement;
 
 let currentGame = null;
@@ -83,9 +85,9 @@ function handleSearch() {
   let   visible = 0;
 
   document.querySelectorAll('.game-card').forEach(card => {
-    const tags  = normalizeStr(card.getAttribute('data-tags') || '');
-    const title = normalizeStr(card.querySelector('.card-title')?.textContent || '');
-    const match = !norm || tags.includes(norm) || title.includes(norm);
+    const tags = normalizeStr(card.getAttribute('data-tags') || '');
+    const cardContent = normalizeStr(card.textContent || '');
+    const match = !norm || tags.includes(norm) || cardContent.includes(norm);
     card.hidden = !match;
     if (match) visible++;
   });
@@ -97,10 +99,8 @@ function handleSearch() {
       return;
     }
     const cards = section.querySelectorAll('.game-card');
-    const hasSoon = section.querySelector('.cat-soon');
-    // Mostra seção se tem cards visíveis, ou se só tem o "em breve"
     const visibleCards = [...cards].filter(c => !c.hidden);
-    section.hidden = visibleCards.length === 0 && !hasSoon;
+    section.hidden = visibleCards.length === 0;
   });
 
   if (norm && visible === 0) {
@@ -114,62 +114,62 @@ function handleSearch() {
 searchInput.addEventListener('input', handleSearch);
 
 // ─────────────────────────────────────────────────────────
-// MENU HAMBÚRGUER (CATEGORIAS)
+// MENU HAMBÚRGUER (DRAWER DE CATEGORIAS)
 // ─────────────────────────────────────────────────────────
 
 function openMenu() {
-  categoryMenu.hidden = false;
+  drawerBackdrop.classList.add('is-open');
+  categoryMenu.classList.add('is-open');
+  document.body.classList.add('drawer-open');
   menuToggle.setAttribute('aria-expanded', 'true');
-  categoryMenu.querySelectorAll('.cat-link').forEach(l => l.setAttribute('tabindex', '0'));
-  // Foca no primeiro link
-  const firstLink = categoryMenu.querySelector('.cat-link');
-  if (firstLink) setTimeout(() => firstLink.focus(), 10);
+  categoryMenu.setAttribute('aria-hidden', 'false');
+  setTimeout(() => drawerClose.focus(), 120);
 }
 
-function closeMenu() {
-  categoryMenu.hidden = true;
+function closeMenu(restoreFocus = false) {
+  drawerBackdrop.classList.remove('is-open');
+  categoryMenu.classList.remove('is-open');
+  document.body.classList.remove('drawer-open');
   menuToggle.setAttribute('aria-expanded', 'false');
-  categoryMenu.querySelectorAll('.cat-link').forEach(l => l.setAttribute('tabindex', '-1'));
+  categoryMenu.setAttribute('aria-hidden', 'true');
+  if (restoreFocus) menuToggle.focus();
 }
 
 menuToggle.addEventListener('click', () => {
-  categoryMenu.hidden ? openMenu() : closeMenu();
+  menuToggle.getAttribute('aria-expanded') === 'true' ? closeMenu() : openMenu();
 });
 
-// Fechar ao clicar fora
-document.addEventListener('click', e => {
-  if (!menuToggle.contains(e.target) && !categoryMenu.contains(e.target)) {
-    closeMenu();
-  }
-});
+drawerClose.addEventListener('click', () => closeMenu(true));
+drawerBackdrop.addEventListener('click', () => closeMenu(true));
 
 // Fechar com Escape
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && !categoryMenu.hidden) {
-    closeMenu();
-    menuToggle.focus();
+  if (e.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
+    closeMenu(true);
   }
 });
 
-// Navegação por teclado dentro do menu (setas)
-categoryMenu.addEventListener('keydown', e => {
-  const links = [...categoryMenu.querySelectorAll('.cat-link')];
-  const idx = links.indexOf(document.activeElement);
-  if (e.key === 'ArrowDown') {
-    e.preventDefault();
-    links[(idx + 1) % links.length]?.focus();
-  } else if (e.key === 'ArrowUp') {
-    e.preventDefault();
-    links[(idx - 1 + links.length) % links.length]?.focus();
-  }
+// Cada categoria abre seus subníveis também por teclado e clique.
+categoryMenu.querySelectorAll('.drawer-category').forEach(category => {
+  category.addEventListener('click', () => {
+    const willOpen = category.getAttribute('aria-expanded') !== 'true';
+    categoryMenu.querySelectorAll('.drawer-category').forEach(item => item.setAttribute('aria-expanded', 'false'));
+    category.setAttribute('aria-expanded', String(willOpen));
+  });
 });
 
-// Links de categoria → rolar até a seção
-categoryMenu.querySelectorAll('.cat-link').forEach(link => {
+// Itens do drawer levam à categoria ou abrem imediatamente os jogos ativos.
+categoryMenu.querySelectorAll('.drawer-games a').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
     const targetId = link.getAttribute('href').slice(1);
+    const gameId = link.getAttribute('data-game');
     closeMenu();
+
+    if (gameId) {
+      showGame(gameId);
+      return;
+    }
 
     const doScroll = () => {
       const el = document.getElementById(targetId);
