@@ -28,6 +28,7 @@
   --accent:        #947c6c;
   --surface-brown: #807060;
   --on-brown:      #f7f4ec;
+  --ms-cell-line:  rgba(93, 75, 60, 0.35);
   --border:        #b4a38f;
   --divider:       rgba(180, 163, 143, 0.62);
   --shadow-sm:     0 1px 4px rgba(70, 60, 50, 0.06);
@@ -61,6 +62,7 @@
   --accent:       #C4A882;
   --surface-brown: #4A392B;
   --on-brown:      #F5EDE3;
+  --ms-cell-line:  rgba(245, 237, 227, 0.35);
   --border:       rgba(196, 168, 130, 0.22);
   --divider:      rgba(196, 168, 130, 0.12);
   --shadow-sm:    0 1px 4px rgba(0, 0, 0, 0.30);
@@ -81,6 +83,7 @@
   --accent:       #F5C842;
   --surface-brown: #000000;
   --on-brown:      #FFFFFF;
+  --ms-cell-line:  #FFFFFF;
   --border:       rgba(255, 255, 255, 0.6);
   --divider:      rgba(255, 255, 255, 0.2);
   --shadow-sm:    none;
@@ -182,6 +185,10 @@ body {
 .topbar .topbar-divider { background-color: rgba(247, 244, 236, 0.35); }
 .topbar .menu-toggle:hover,
 .topbar .a11y-btn:hover { background-color: rgba(247, 244, 236, 0.14); color: #f7f4ec; }
+
+.topbar .topbar-brand:hover,
+.topbar .topbar-brand:focus-visible,
+.topbar .topbar-brand:active { color: #E0B24F; }
 
 .topbar-inner {
   display: flex;
@@ -874,14 +881,18 @@ body.drawer-open { overflow: hidden; }
 .ms-grid-wrap {
   overflow-x: auto;
   max-width: 100%;
-  padding-bottom: 4px; /* espaço para scrollbar */
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .ms-grid {
   display: inline-grid;
-  gap: 2px;
-  background: var(--border);
-  border: 2px solid var(--brown-pastel);
+  gap: 1px;
+  background: var(--on-brown);
+  border: 2px solid var(--on-brown);
   border-radius: var(--radius-sm);
   overflow: hidden;
 }
@@ -889,8 +900,8 @@ body.drawer-open { overflow: hidden; }
 .ms-cell {
   width: 34px;
   height: 34px;
-  background: var(--bg-card);
-  border: none;
+  background: var(--brown-light);
+  border: 1px solid var(--ms-cell-line);
   font-family: var(--font-sans);
   font-size: 0.78rem;
   font-weight: 700;
@@ -911,7 +922,7 @@ body.drawer-open { overflow: hidden; }
 }
 
 .ms-cell:hover:not(:disabled):not(.ms-cell--revealed) {
-  background: rgba(187,173,160,0.18);
+  background: var(--brown-pastel);
 }
 
 .ms-cell--revealed {
@@ -927,9 +938,10 @@ body.drawer-open { overflow: hidden; }
 
 [data-theme="dark"] .ms-cell--mine { background: #7A2828; }
 [data-theme="high-contrast"] .ms-cell--mine { background: #CC0000; color: #FFF; }
+[data-theme="high-contrast"] .ms-grid { background: #000; border-color: #000; }
 
 .ms-cell--flagged {
-  color: var(--accent);
+  color: #FFFFFF;
   font-weight: 700;
 }
 

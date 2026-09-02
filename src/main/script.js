@@ -23,8 +23,15 @@ const categoryMenu = document.getElementById('category-menu');
 const drawerBackdrop = document.getElementById('drawer-backdrop');
 const drawerClose   = document.getElementById('drawer-close');
 const htmlEl       = document.documentElement;
+const topbarBrand   = document.querySelector('.topbar-brand');
 
 let currentGame = null;
+
+topbarBrand.addEventListener('click', event => {
+  event.preventDefault();
+  showHome();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
 
 // ─────────────────────────────────────────────────────────
 // NAVEGAÇÃO ENTRE VIEWS
