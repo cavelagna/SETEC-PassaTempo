@@ -34,9 +34,11 @@ const Snake = (() => {
     direction = { x: 1, y: 0 };
     nextDir   = { x: 1, y: 0 };
     score     = 0;
-    gameState = 'running';
+    gameState = 'ready';
     spawnFood();
     updateScore();
+    updateStartButton();
+    draw();
   }
 
   function spawnFood() {
@@ -86,13 +88,21 @@ const Snake = (() => {
   function endGame() {
     gameState = 'lost';
     clearInterval(intervalId);
+    updateStartButton();
     draw(); // renderiza overlay de game over
+  }
+
+  function start() {
+    if (gameState === 'running') return;
+    gameState = 'running';
+    updateStartButton();
+    intervalId = setInterval(tick, SPEED);
   }
 
   function restart() {
     clearInterval(intervalId);
     init();
-    intervalId = setInterval(tick, SPEED);
+    start();
   }
 
   // ── Renderização em Canvas ────────────────────────────────
@@ -108,14 +118,15 @@ const Snake = (() => {
     const accent = style.getPropertyValue('--accent').trim()      || '#8F7A66';
     const text   = style.getPropertyValue('--text-strong').trim() || '#5A5248';
     const muted  = style.getPropertyValue('--text-muted').trim()  || '#A09488';
+    const divider = style.getPropertyValue('--divider').trim()    || '#B4A38F';
 
     // Fundo do canvas
     ctx.fillStyle = bgCard;
     ctx.fillRect(0, 0, W, H);
 
     // Grade sutil
-    ctx.strokeStyle = 'rgba(187,173,160,0.08)';
-    ctx.lineWidth   = 0.5;
+    ctx.strokeStyle = divider;
+    ctx.lineWidth   = 1;
     for (let x = 0; x <= W; x += CELL) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
     }
@@ -141,19 +152,19 @@ const Snake = (() => {
       ctx.fill();
     });
 
-    // Overlay de fim de jogo
-    if (gameState === 'lost') {
+    // Overlay de espera ou fim de jogo
+    if (gameState === 'ready' || gameState === 'lost') {
       ctx.fillStyle = bgPage.includes('#') ? bgPage + 'DD' : 'rgba(250,248,239,0.88)';
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = text;
       ctx.font      = `bold 1.1rem 'Libre Baskerville', serif`;
       ctx.textAlign = 'center';
-      ctx.fillText('Fim de jogo', W / 2, H / 2 - 10);
+      ctx.fillText(gameState === 'ready' ? 'Pronto para jogar' : 'Fim de jogo', W / 2, H / 2 - 10);
       ctx.font      = `0.82rem 'Inter', sans-serif`;
       ctx.fillStyle = muted;
-      ctx.fillText(`Pontuação: ${score}`, W / 2, H / 2 + 14);
+      ctx.fillText(gameState === 'ready' ? 'Clique em Iniciar para começar' : `Pontuação: ${score}`, W / 2, H / 2 + 14);
       ctx.font      = `0.75rem 'Inter', sans-serif`;
-      ctx.fillText('Clique em Reiniciar para jogar novamente', W / 2, H / 2 + 36);
+      if (gameState === 'lost') ctx.fillText('Clique em Reiniciar para jogar novamente', W / 2, H / 2 + 36);
     }
   }
 
@@ -161,6 +172,11 @@ const Snake = (() => {
     const el = container?.querySelector('.snake-score');
     if (el) el.setAttribute('aria-live', 'polite'),
             el.textContent = `Pontuação: ${score}`;
+  }
+
+  function updateStartButton() {
+    const btn = container?.querySelector('.snake-start-btn');
+    if (btn) btn.hidden = gameState !== 'ready';
   }
 
   // ── Controles de teclado ──────────────────────────────────
@@ -228,6 +244,12 @@ const Snake = (() => {
     const controls = document.createElement('div');
     controls.className = 'snake-controls';
 
+    const startBtn = document.createElement('button');
+    startBtn.className = 'game-action-btn snake-start-btn';
+    startBtn.textContent = 'Iniciar';
+    startBtn.addEventListener('click', start);
+    controls.appendChild(startBtn);
+
     const restartBtn = document.createElement('button');
     restartBtn.className = 'game-action-btn';
     restartBtn.textContent = 'Reiniciar';
@@ -274,7 +296,6 @@ const Snake = (() => {
     container = el;
     buildDOM();
     init();
-    intervalId = setInterval(tick, SPEED);
     document.addEventListener('keydown', handleKey);
     canvas.focus();
   }
