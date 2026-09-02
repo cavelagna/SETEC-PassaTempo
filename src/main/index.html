@@ -37,18 +37,6 @@
           <span class="hamburger-line" aria-hidden="true"></span>
         </button>
 
-        <div
-          class="category-menu"
-          id="category-menu"
-          role="menu"
-          aria-labelledby="menu-toggle"
-          hidden
-        >
-          <a class="cat-link" href="#categoria-logica"    role="menuitem" tabindex="-1">Lógica</a>
-          <a class="cat-link" href="#categoria-memoria"   role="menuitem" tabindex="-1">Memória</a>
-          <a class="cat-link" href="#categoria-classicos" role="menuitem" tabindex="-1">Clássicos</a>
-          <a class="cat-link" href="#categoria-estrategia" role="menuitem" tabindex="-1">Estratégia</a>
-        </div>
       </div>
 
       <!-- Centro: nome discreto do site -->
@@ -91,6 +79,38 @@
   </nav>
   <!-- ─── /Barra de navegação ─────────────────────────────── -->
 
+  <!-- Drawer de categorias: permanece no DOM para a animação de abertura -->
+  <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
+  <aside class="category-drawer" id="category-menu" aria-labelledby="drawer-title" aria-hidden="true">
+    <div class="drawer-header">
+      <p class="drawer-eyebrow">Catálogo</p>
+      <h2 id="drawer-title">PassaTempo</h2>
+      <button class="drawer-close" id="drawer-close" type="button" aria-label="Fechar menu de categorias">×</button>
+    </div>
+    <nav class="drawer-nav" aria-label="Categorias e jogos">
+      <div class="drawer-group">
+        <button class="drawer-category" type="button" aria-expanded="false">Lógica</button>
+        <ul class="drawer-games"><li><a href="#categoria-logica">Sudoku</a></li><li><a href="#categoria-logica">2048</a></li><li><a href="#categoria-logica">Kakuro</a></li><li><a href="#categoria-logica">Nonograma</a></li></ul>
+      </div>
+      <div class="drawer-group">
+        <button class="drawer-category" type="button" aria-expanded="false">Memória</button>
+        <ul class="drawer-games"><li><a href="#categoria-memoria" data-game="memory">Jogo da Memória</a></li><li><a href="#categoria-memoria">Sequência Visual</a></li><li><a href="#categoria-memoria">Simon</a></li></ul>
+      </div>
+      <div class="drawer-group">
+        <button class="drawer-category" type="button" aria-expanded="false">Clássicos</button>
+        <ul class="drawer-games"><li><a href="#categoria-classicos" data-game="snake">Snake</a></li><li><a href="#categoria-logica" data-game="minesweeper">Campo Minado</a></li><li><a href="#categoria-classicos" data-game="tictactoe">Jogo da Velha</a></li><li><a href="#categoria-classicos">Damas</a></li><li><a href="#categoria-classicos">Xadrez</a></li><li><a href="#categoria-classicos">Paciência</a></li></ul>
+      </div>
+      <div class="drawer-group">
+        <button class="drawer-category" type="button" aria-expanded="false">Matemática</button>
+        <ul class="drawer-games"><li><a href="#categoria-matematica">Cálculo Rápido</a></li><li><a href="#categoria-matematica">Tabuada</a></li><li><a href="#categoria-matematica">Desafio Numérico</a></li></ul>
+      </div>
+      <div class="drawer-group">
+        <button class="drawer-category" type="button" aria-expanded="false">Palavras</button>
+        <ul class="drawer-games"><li><a href="#categoria-palavras">Palavras Cruzadas</a></li><li><a href="#categoria-palavras">Caça-Palavras</a></li><li><a href="#categoria-palavras">Forca</a></li></ul>
+      </div>
+    </nav>
+  </aside>
+
   <!-- ─── Conteúdo principal ─────────────────────────────── -->
   <main id="main-content">
 
@@ -100,8 +120,7 @@
       <header class="site-header">
         <h1 class="site-title">PassaTempo</h1>
         <p class="site-subtitle">
-          Coleção de jogos clássicos para relaxar, pensar<br>
-          e simplesmente passar o tempo.
+          Coleção de jogos clássicos para relaxar, pensar e simplesmente passar o tempo.
         </p>
       </header>
 
@@ -144,10 +163,7 @@
                   <line x1="16.5" y1="3.5"  x2="14.5" y2="5.5"/>
                   <line x1="5.5"  y1="14.5" x2="3.5"  y2="16.5"/>
                 </svg>
-                <div class="card-info">
-                  <h3 class="card-title">Campo Minado</h3>
-                  <span class="card-meta">Lógica · Médio</span>
-                </div>
+                <div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Campo Minado</h3><span class="card-meta">Dificuldade: Médio</span></div>
               </div>
               <p class="card-desc">Revele o campo sem acionar as minas. Use os números como pistas para deduzir onde elas estão.</p>
               <button class="card-btn" data-game="minesweeper" aria-label="Jogar Campo Minado">Jogar</button>
@@ -163,13 +179,23 @@
                   <line x1="2"  y1="7.3"  x2="18" y2="7.3"/>
                   <line x1="2"  y1="12.7" x2="18" y2="12.7"/>
                 </svg>
-                <div class="card-info">
-                  <h3 class="card-title">Sudoku</h3>
-                  <span class="card-meta">Lógica · Variável</span>
-                </div>
+                <div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Sudoku</h3><span class="card-meta">Dificuldade: Variável</span></div>
               </div>
               <p class="card-desc">Preencha a grade 9×9 com números de 1 a 9. Cada linha, coluna e bloco 3×3 deve conter todos os dígitos.</p>
               <button class="card-btn" data-game="sudoku" aria-label="Jogar Sudoku">Jogar</button>
+            </article>
+
+            <article class="game-card game-card--soon" data-tags="2048 logica numeros blocos">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">2048</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <p class="card-desc">Una números iguais e alcance a peça 2048 neste quebra-cabeça de estratégia.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="kakuro logica numeros soma">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 3h18v18H3zM3 10h18M10 3v18"/><path d="m4 9 5-5M11 20l9-9"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Kakuro</h3><span class="card-meta">Dificuldade: Difícil</span></div></div>
+              <p class="card-desc">Preencha as somas cruzadas usando raciocínio e combinações numéricas.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="nonograma logica pixels desenho">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 4h16v16H4zM9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/><path d="M5 5h4v4H5zM15 15h4v4h-4z" fill="currentColor" stroke="none"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Nonograma</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <p class="card-desc">Decifre as pistas e revele desenhos escondidos em uma grade de pixels.</p><span class="card-soon-badge">Em breve</span>
             </article>
 
           </div>
@@ -191,13 +217,18 @@
                   <line x1="13" y1="8.5" x2="17" y2="8.5"/>
                   <line x1="15" y1="6.5" x2="15" y2="10.5"/>
                 </svg>
-                <div class="card-info">
-                  <h3 class="card-title">Jogo da Memória</h3>
-                  <span class="card-meta">Memória · Fácil</span>
-                </div>
+                <div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Jogo da Memória</h3><span class="card-meta">Dificuldade: Fácil</span></div>
               </div>
               <p class="card-desc">Encontre os pares virando duas cartas por vez. Treine a concentração e a memória visual.</p>
               <button class="card-btn" data-game="memory" aria-label="Jogar Jogo da Memória">Jogar</button>
+            </article>
+            <article class="game-card game-card--soon" data-tags="sequencia visual memoria cores padrao">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="18" cy="12" r="2"/><path d="M8 11 10 8M14 8l2 3"/></svg><div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Sequência Visual</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <p class="card-desc">Observe o padrão, guarde a sequência e repita cada novo desafio.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="simon memoria sequencia sons">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="2"/></svg><div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Simon</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <p class="card-desc">Acompanhe luzes e sons em sequências que ficam maiores a cada rodada.</p><span class="card-soon-badge">Em breve</span>
             </article>
 
           </div>
@@ -217,10 +248,7 @@
                   <line x1="2"  y1="7"  x2="18" y2="7"/>
                   <line x1="2"  y1="13" x2="18" y2="13"/>
                 </svg>
-                <div class="card-info">
-                  <h3 class="card-title">Jogo da Velha</h3>
-                  <span class="card-meta">Clássicos · Fácil</span>
-                </div>
+                <div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Jogo da Velha</h3><span class="card-meta">Dificuldade: Fácil</span></div>
               </div>
               <p class="card-desc">O clássico de todos os tempos. Dois jogadores se alternam marcando X e O em uma grade 3×3.</p>
               <button class="card-btn" data-game="tictactoe" aria-label="Jogar Jogo da Velha">Jogar</button>
@@ -233,22 +261,37 @@
                   <path d="M2.5 7.5 Q2.5 3 7 3 Q11 3 11 7.5 Q11 12 15 12 Q19.5 12 19.5 16.5"/>
                   <circle cx="2.5" cy="7.5" r="1.8" fill="currentColor" stroke="none"/>
                 </svg>
-                <div class="card-info">
-                  <h3 class="card-title">Snake</h3>
-                  <span class="card-meta">Clássicos · Médio</span>
-                </div>
+                <div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Snake</h3><span class="card-meta">Dificuldade: Médio</span></div>
               </div>
               <p class="card-desc">Guie a cobra para comer e crescer sem colidir com as paredes ou com você mesmo.</p>
               <button class="card-btn" data-game="snake" aria-label="Jogar Snake">Jogar</button>
+            </article>
+            <article class="game-card game-card--soon" data-tags="damas classicos estrategia tabuleiro">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 4h16v16H4zM4 10h16M10 4v16"/><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Damas</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Capture as peças adversárias e atravesse o tabuleiro com estratégia.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="xadrez classicos estrategia rei">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M9 4h6M12 2v5M9 8h6l-1 5 3 5H7l3-5zM6 21h12M8 18h8v3H8z"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Xadrez</h3><span class="card-meta">Dificuldade: Difícil</span></div></div><p class="card-desc">Planeje cada lance no clássico jogo de estratégia para duas pessoas.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="paciencia classicos cartas solitario">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="4" width="11" height="15" rx="1.5"/><rect x="9" y="7" width="11" height="13" rx="1.5"/><path d="m14.5 11 2 2 2-2M16.5 10v5"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Paciência</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Organize as cartas em sequência em uma pausa tranquila para pensar.</p><span class="card-soon-badge">Em breve</span>
             </article>
 
           </div>
         </section>
 
-        <!-- ── ESTRATÉGIA (em breve) ── -->
-        <section class="cat-section" id="categoria-estrategia" aria-labelledby="lbl-estrategia">
-          <h2 class="cat-heading" id="lbl-estrategia">Estratégia</h2>
-          <p class="cat-soon">Novos jogos a caminho.</p>
+        <section class="cat-section" id="categoria-matematica" aria-labelledby="lbl-matematica">
+          <h2 class="cat-heading" id="lbl-matematica">Matemática</h2><div class="cards-grid">
+            <article class="game-card game-card--soon" data-tags="calculo rapido matematica contas"><div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 7h14M12 3v8M5 17h14M7 13l10 8M17 13 7 21"/></svg><div class="card-info"><span class="card-category">Matemática</span><h3 class="card-title">Cálculo Rápido</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Resolva contas mentais antes que o tempo acabe.</p><span class="card-soon-badge">Em breve</span></article>
+            <article class="game-card game-card--soon" data-tags="tabuada matematica multiplicacao"><div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 5h14v14H5zM8 9h8M8 13h8M8 17h8"/></svg><div class="card-info"><span class="card-category">Matemática</span><h3 class="card-title">Tabuada</h3><span class="card-meta">Dificuldade: Fácil</span></div></div><p class="card-desc">Pratique multiplicação de um jeito direto e leve.</p><span class="card-soon-badge">Em breve</span></article>
+            <article class="game-card game-card--soon" data-tags="desafio numerico matematica numeros"><div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><text x="4" y="17" fill="currentColor" stroke="none" font-size="15" font-family="serif">1 2</text></svg><div class="card-info"><span class="card-category">Matemática</span><h3 class="card-title">Desafio Numérico</h3><span class="card-meta">Dificuldade: Difícil</span></div></div><p class="card-desc">Combine números e operações para alcançar o resultado pedido.</p><span class="card-soon-badge">Em breve</span></article>
+          </div>
+        </section>
+        <section class="cat-section" id="categoria-palavras" aria-labelledby="lbl-palavras">
+          <h2 class="cat-heading" id="lbl-palavras">Palavras</h2><div class="cards-grid">
+            <article class="game-card game-card--soon" data-tags="palavras cruzadas letras vocabulario"><div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 4h16v16H4zM4 10h16M10 4v16"/><path d="M7 7h.01M13 13h.01M17 17h.01" stroke-width="2"/></svg><div class="card-info"><span class="card-category">Palavras</span><h3 class="card-title">Palavras Cruzadas</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Resolva pistas e complete palavras que se encontram na grade.</p><span class="card-soon-badge">Em breve</span></article>
+            <article class="game-card game-card--soon" data-tags="caca palavras letras vocabulario"><div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><text x="2" y="17" fill="currentColor" stroke="none" font-size="14" font-family="serif">A B C</text></svg><div class="card-info"><span class="card-category">Palavras</span><h3 class="card-title">Caça-Palavras</h3><span class="card-meta">Dificuldade: Fácil</span></div></div><p class="card-desc">Encontre as palavras escondidas em meio às letras embaralhadas.</p><span class="card-soon-badge">Em breve</span></article>
+            <article class="game-card game-card--soon" data-tags="forca palavras letras vocabulario"><div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M5 21h14M8 21V4h8M16 4v3M16 7c0 2-3 2-3 4v2"/><circle cx="13" cy="9" r="2"/></svg><div class="card-info"><span class="card-category">Palavras</span><h3 class="card-title">Forca</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Adivinhe a palavra, letra por letra, antes que as tentativas acabem.</p><span class="card-soon-badge">Em breve</span></article>
+          </div>
         </section>
 
       </div>
@@ -278,7 +321,10 @@
 
   <!-- ─── Rodapé ─────────────────────────────────────────── -->
   <footer class="site-footer" role="contentinfo">
-    <p>PassaTempo &middot; SETEC 2026 &middot; Colégio Estadual Barbosa Ferraz</p>
+    <p class="footer-brand">PassaTempo</p>
+    <p>Desenvolvido para a SETEC 2026</p>
+    <p>Desenvolvido por Giovanni Cavelagna</p>
+    <p>Colégio Estadual Barbosa Ferraz</p>
   </footer>
 
   <!-- Módulos dos jogos (carregados antes do orquestrador) -->
