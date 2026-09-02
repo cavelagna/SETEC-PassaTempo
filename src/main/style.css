@@ -378,7 +378,7 @@ body.drawer-open { overflow: hidden; }
 
 .site-title {
   font-family: var(--font-serif);
-  font-size: 56px;
+  font-size: 68px;
   font-weight: 700;
   color: var(--text-strong);
   letter-spacing: -0.02em;
