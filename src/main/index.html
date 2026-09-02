@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="" data-font="medium">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PassaTempo — uma coleção de jogos clássicos para relaxar, pensar e simplesmente passar o tempo.">
+  <meta name="theme-color" content="#FAF8EF">
+  <title>PassaTempo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Acessibilidade: pular para o conteúdo -->
+  <a class="skip-link" href="#main-content">Ir para o conteúdo principal</a>
+
+  <!-- ─── Barra de navegação flutuante ───────────────────── -->
+  <nav class="topbar" role="navigation" aria-label="Navegação principal e acessibilidade">
+    <div class="topbar-inner">
+
+      <!-- Esquerda: hambúrguer + menu de categorias -->
+      <div class="topbar-left">
+        <button
+          class="menu-toggle"
+          id="menu-toggle"
+          aria-haspopup="true"
+          aria-expanded="false"
+          aria-controls="category-menu"
+          aria-label="Abrir menu de categorias"
+        >
+          <span class="hamburger-line" aria-hidden="true"></span>
+          <span class="hamburger-line" aria-hidden="true"></span>
+          <span class="hamburger-line" aria-hidden="true"></span>
+        </button>
+
+        <div
+          class="category-menu"
+          id="category-menu"
+          role="menu"
+          aria-labelledby="menu-toggle"
+          hidden
+        >
+          <a class="cat-link" href="#categoria-logica"    role="menuitem" tabindex="-1">Lógica</a>
+          <a class="cat-link" href="#categoria-memoria"   role="menuitem" tabindex="-1">Memória</a>
+          <a class="cat-link" href="#categoria-classicos" role="menuitem" tabindex="-1">Clássicos</a>
+          <a class="cat-link" href="#categoria-estrategia" role="menuitem" tabindex="-1">Estratégia</a>
+        </div>
+      </div>
+
+      <!-- Centro: nome discreto do site -->
+      <a class="topbar-brand" href="#" aria-label="PassaTempo — início">PassaTempo</a>
+
+      <!-- Direita: controles de acessibilidade -->
+      <div class="topbar-right" role="group" aria-label="Configurações de acessibilidade">
+
+        <button class="a11y-btn" id="btn-font-down" aria-label="Diminuir tamanho da fonte" title="Diminuir fonte">
+          <span class="a11y-font-label" aria-hidden="true">
+            <span class="fl-big">A</span><span class="fl-sign">−</span>
+          </span>
+        </button>
+
+        <button class="a11y-btn" id="btn-font-up" aria-label="Aumentar tamanho da fonte" title="Aumentar fonte">
+          <span class="a11y-font-label" aria-hidden="true">
+            <span class="fl-big">A</span><span class="fl-sign">+</span>
+          </span>
+        </button>
+
+        <div class="topbar-divider" aria-hidden="true"></div>
+
+        <button class="a11y-btn" id="btn-contrast" aria-label="Alternar alto contraste" aria-pressed="false" title="Alto contraste">
+          <!-- Meio círculo preenchido = símbolo de contraste -->
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none">
+            <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M8 1.5 A6.5 6.5 0 0 1 8 14.5 Z" fill="currentColor"/>
+          </svg>
+        </button>
+
+        <button class="a11y-btn" id="btn-dark" aria-label="Alternar modo noturno" aria-pressed="false" title="Modo noturno">
+          <!-- Lua crescente -->
+          <svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true" fill="currentColor">
+            <path d="M13.5 10.2A6.2 6.2 0 0 1 4.8 1.5a6.2 6.2 0 1 0 8.7 8.7Z"/>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+  </nav>
+  <!-- ─── /Barra de navegação ─────────────────────────────── -->
+
+  <!-- ─── Conteúdo principal ─────────────────────────────── -->
+  <main id="main-content">
+
+    <!-- ════ VIEW: HOME ════ -->
+    <div id="view-home" class="view">
+
+      <header class="site-header">
+        <h1 class="site-title">PassaTempo</h1>
+        <p class="site-subtitle">
+          Coleção de jogos clássicos para relaxar, pensar<br>
+          e simplesmente passar o tempo.
+        </p>
+      </header>
+
+      <!-- Busca em tempo real -->
+      <div class="search-wrapper" role="search">
+        <label for="game-search" class="sr-only">Buscar jogo</label>
+        <input
+          type="search"
+          id="game-search"
+          class="search-input"
+          placeholder="Buscar um jogo..."
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Buscar jogo no catálogo"
+        >
+      </div>
+
+      <!-- Mensagem quando busca não encontra nada -->
+      <p class="search-empty" id="search-empty" hidden aria-live="polite" role="status"></p>
+
+      <!-- Catálogo de jogos por categoria -->
+      <div class="catalog" id="catalog">
+
+        <!-- ── LÓGICA ── -->
+        <section class="cat-section" id="categoria-logica" aria-labelledby="lbl-logica">
+          <h2 class="cat-heading" id="lbl-logica">Lógica</h2>
+          <div class="cards-grid">
+
+            <article class="game-card" data-game="minesweeper" data-tags="campo minado minas logica deducao">
+              <div class="card-top">
+                <svg class="card-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"
+                     fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                  <circle cx="10" cy="10" r="4"/>
+                  <line x1="10" y1="1"  x2="10" y2="4"/>
+                  <line x1="10" y1="16" x2="10" y2="19"/>
+                  <line x1="1"  y1="10" x2="4"  y2="10"/>
+                  <line x1="16" y1="10" x2="19" y2="10"/>
+                  <line x1="3.5" y1="3.5"   x2="5.5" y2="5.5"/>
+                  <line x1="14.5" y1="14.5" x2="16.5" y2="16.5"/>
+                  <line x1="16.5" y1="3.5"  x2="14.5" y2="5.5"/>
+                  <line x1="5.5"  y1="14.5" x2="3.5"  y2="16.5"/>
+                </svg>
+                <div class="card-info">
+                  <h3 class="card-title">Campo Minado</h3>
+                  <span class="card-meta">Lógica · Médio</span>
+                </div>
+              </div>
+              <p class="card-desc">Revele o campo sem acionar as minas. Use os números como pistas para deduzir onde elas estão.</p>
+              <button class="card-btn" data-game="minesweeper" aria-label="Jogar Campo Minado">Jogar</button>
+            </article>
+
+            <article class="game-card" data-game="sudoku" data-tags="sudoku numeros logica matematica grade">
+              <div class="card-top">
+                <svg class="card-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"
+                     fill="none" stroke="currentColor" stroke-width="1.3">
+                  <rect x="2" y="2" width="16" height="16" rx="1.5"/>
+                  <line x1="7.3"  y1="2"  x2="7.3"  y2="18"/>
+                  <line x1="12.7" y1="2"  x2="12.7" y2="18"/>
+                  <line x1="2"  y1="7.3"  x2="18" y2="7.3"/>
+                  <line x1="2"  y1="12.7" x2="18" y2="12.7"/>
+                </svg>
+                <div class="card-info">
+                  <h3 class="card-title">Sudoku</h3>
+                  <span class="card-meta">Lógica · Variável</span>
+                </div>
+              </div>
+              <p class="card-desc">Preencha a grade 9×9 com números de 1 a 9. Cada linha, coluna e bloco 3×3 deve conter todos os dígitos.</p>
+              <button class="card-btn" data-game="sudoku" aria-label="Jogar Sudoku">Jogar</button>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- ── MEMÓRIA ── -->
+        <section class="cat-section" id="categoria-memoria" aria-labelledby="lbl-memoria">
+          <h2 class="cat-heading" id="lbl-memoria">Memória</h2>
+          <div class="cards-grid">
+
+            <article class="game-card" data-game="memory" data-tags="memoria jogo da memoria pares cartas concentracao">
+              <div class="card-top">
+                <svg class="card-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"
+                     fill="none" stroke="currentColor" stroke-width="1.3">
+                  <rect x="1.5" y="4"   width="7" height="9" rx="1.5"/>
+                  <rect x="11.5" y="4"  width="7" height="9" rx="1.5"/>
+                  <line x1="5"  y1="7"  x2="5"  y2="10"/>
+                  <line x1="3.5" y1="8.5" x2="6.5" y2="8.5"/>
+                  <line x1="13" y1="8.5" x2="17" y2="8.5"/>
+                  <line x1="15" y1="6.5" x2="15" y2="10.5"/>
+                </svg>
+                <div class="card-info">
+                  <h3 class="card-title">Jogo da Memória</h3>
+                  <span class="card-meta">Memória · Fácil</span>
+                </div>
+              </div>
+              <p class="card-desc">Encontre os pares virando duas cartas por vez. Treine a concentração e a memória visual.</p>
+              <button class="card-btn" data-game="memory" aria-label="Jogar Jogo da Memória">Jogar</button>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- ── CLÁSSICOS ── -->
+        <section class="cat-section" id="categoria-classicos" aria-labelledby="lbl-classicos">
+          <h2 class="cat-heading" id="lbl-classicos">Clássicos</h2>
+          <div class="cards-grid">
+
+            <article class="game-card" data-game="tictactoe" data-tags="jogo da velha tic tac toe xo classico dois jogadores">
+              <div class="card-top">
+                <svg class="card-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"
+                     fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                  <line x1="7"  y1="2"  x2="7"  y2="18"/>
+                  <line x1="13" y1="2"  x2="13" y2="18"/>
+                  <line x1="2"  y1="7"  x2="18" y2="7"/>
+                  <line x1="2"  y1="13" x2="18" y2="13"/>
+                </svg>
+                <div class="card-info">
+                  <h3 class="card-title">Jogo da Velha</h3>
+                  <span class="card-meta">Clássicos · Fácil</span>
+                </div>
+              </div>
+              <p class="card-desc">O clássico de todos os tempos. Dois jogadores se alternam marcando X e O em uma grade 3×3.</p>
+              <button class="card-btn" data-game="tictactoe" aria-label="Jogar Jogo da Velha">Jogar</button>
+            </article>
+
+            <article class="game-card" data-game="snake" data-tags="snake cobra arcade classico pontuacao velocidade">
+              <div class="card-top">
+                <svg class="card-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"
+                     fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round">
+                  <path d="M2.5 7.5 Q2.5 3 7 3 Q11 3 11 7.5 Q11 12 15 12 Q19.5 12 19.5 16.5"/>
+                  <circle cx="2.5" cy="7.5" r="1.8" fill="currentColor" stroke="none"/>
+                </svg>
+                <div class="card-info">
+                  <h3 class="card-title">Snake</h3>
+                  <span class="card-meta">Clássicos · Médio</span>
+                </div>
+              </div>
+              <p class="card-desc">Guie a cobra para comer e crescer sem colidir com as paredes ou com você mesmo.</p>
+              <button class="card-btn" data-game="snake" aria-label="Jogar Snake">Jogar</button>
+            </article>
+
+          </div>
+        </section>
+
+        <!-- ── ESTRATÉGIA (em breve) ── -->
+        <section class="cat-section" id="categoria-estrategia" aria-labelledby="lbl-estrategia">
+          <h2 class="cat-heading" id="lbl-estrategia">Estratégia</h2>
+          <p class="cat-soon">Novos jogos a caminho.</p>
+        </section>
+
+      </div>
+      <!-- /catalog -->
+
+    </div>
+    <!-- ════ /VIEW: HOME ════ -->
+
+    <!-- ════ VIEW: GAME ════ -->
+    <div id="view-game" class="view" hidden>
+      <div class="game-view-top">
+        <button class="back-btn" id="back-btn" aria-label="Voltar ao catálogo de jogos">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"
+               fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <polyline points="9,2 4,7 9,12"/>
+          </svg>
+          Voltar
+        </button>
+        <h2 class="game-running-title" id="game-running-title"></h2>
+      </div>
+      <div id="game-area" tabindex="-1" aria-label="Área do jogo em execução"></div>
+    </div>
+    <!-- ════ /VIEW: GAME ════ -->
+
+  </main>
+  <!-- ─── /Conteúdo principal ─────────────────────────────── -->
+
+  <!-- ─── Rodapé ─────────────────────────────────────────── -->
+  <footer class="site-footer" role="contentinfo">
+    <p>PassaTempo &middot; SETEC 2026 &middot; Colégio Estadual Barbosa Ferraz</p>
+  </footer>
+
+  <!-- Módulos dos jogos (carregados antes do orquestrador) -->
+  <script src="games/ticTacToe.js"></script>
+  <script src="games/memory.js"></script>
+  <script src="games/minesweeper.js"></script>
+  <script src="games/snake.js"></script>
+  <script src="games/sudoku.js"></script>
+
+  <!-- Orquestrador principal -->
+  <script src="script.js"></script>
+
+</body>
+</html>
