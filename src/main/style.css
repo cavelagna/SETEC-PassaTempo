@@ -659,10 +659,42 @@ body.drawer-open { overflow: hidden; }
   line-height: 1.2;
 }
 
-#game-area { outline: none; }
+#game-area {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: min(100%, 720px);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  outline: none;
+}
+
+#game-area > * {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+#game-area::before {
+  content: '';
+  position: absolute;
+  top: 0.65rem;
+  left: 0.65rem;
+  right: 0.65rem;
+  height: 2px;
+  background: var(--brown-pastel);
+  opacity: 0.55;
+}
 
 /* ── Botão de ação compartilhado entre jogos ─────────────── */
 .game-action-btn {
+  min-height: 44px;
   padding: 0.48rem 1.2rem;
   font-family: var(--font-sans);
   font-size: 0.78rem;
@@ -693,6 +725,7 @@ body.drawer-open { overflow: hidden; }
 
 /* ── Jogo da Velha ──────────────────────────────────────── */
 .ttt-wrap {
+  width: 100%;
   max-width: 320px;
   margin: 0 auto;
   display: flex;
@@ -748,6 +781,7 @@ body.drawer-open { overflow: hidden; }
 
 /* ── Jogo da Memória ────────────────────────────────────── */
 .mem-wrap {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -835,6 +869,7 @@ body.drawer-open { overflow: hidden; }
 
 /* ── Campo Minado ───────────────────────────────────────── */
 .ms-wrap {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -846,6 +881,12 @@ body.drawer-open { overflow: hidden; }
   gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: center;
+}
+
+.ms-diff-btn,
+.ms-flag-btn,
+.ms-restart {
+  flex: 0 1 auto;
 }
 
 .ms-info {
@@ -882,10 +923,6 @@ body.drawer-open { overflow: hidden; }
   overflow-x: auto;
   max-width: 100%;
   padding: 0.75rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
 }
 
 .ms-grid {
@@ -967,6 +1004,7 @@ body.drawer-open { overflow: hidden; }
 
 /* ── Snake ───────────────────────────────────────────────── */
 .snake-wrap {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1037,6 +1075,7 @@ body.drawer-open { overflow: hidden; }
 
 /* ── Sudoku ──────────────────────────────────────────────── */
 .sdk-wrap {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1153,6 +1192,10 @@ body.drawer-open { overflow: hidden; }
   justify-content: center;
 }
 
+.sdk-actions .game-action-btn {
+  flex: 0 1 auto;
+}
+
 .sdk-status {
   font-family: var(--font-serif);
   font-style: italic;
@@ -1210,12 +1253,13 @@ body.drawer-open { overflow: hidden; }
   .game-card { padding: 1.45rem; }
 
   .mem-grid {
-    grid-template-columns: repeat(4, 60px);
+    width: min(100%, 264px);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
   }
 
   .mem-face { font-size: 1.4rem; }
-  .mem-card { width: 60px; height: 78px; }
+  .mem-card { width: 100%; height: 78px; }
 
   .ttt-grid {
     grid-template-columns: repeat(3, 76px);
