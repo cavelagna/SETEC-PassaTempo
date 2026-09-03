@@ -73,6 +73,11 @@ function showGame(id) {
 
   gameArea.innerHTML = '';
   entry.module.mount(gameArea);
+
+  requestAnimationFrame(() => {
+    viewGame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    gameArea.focus({ preventScroll: true });
+  });
 }
 
 // ── Botões "Jogar" nos cards ──────────────────────────────
