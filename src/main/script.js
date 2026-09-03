@@ -3,6 +3,12 @@
 // ── Registro de jogos ─────────────────────────────────────
 // Cada entrada mapeia um ID para o módulo e o título exibido.
 const GAMES = {
+  quickcalc:    { module: QuickCalc,   title: 'Cálculo Rápido' },
+  timestable:   { module: TimesTable,  title: 'Tabuada'       },
+  numberchallenge: { module: NumberChallenge, title: 'Desafio Numérico' },
+  crossword:   { module: Crossword,   title: 'Palavras Cruzadas' },
+  wordsearch:  { module: WordSearch,  title: 'Caça-Palavras' },
+  hangman:     { module: Hangman,     title: 'Forca' },
   minesweeper: { module: Minesweeper, title: 'Campo Minado' },
   sudoku:      { module: Sudoku,      title: 'Sudoku'       },
   memory:      { module: Memory,      title: 'Jogo da Memória' },
@@ -26,6 +32,8 @@ const htmlEl       = document.documentElement;
 const topbarBrand   = document.querySelector('.topbar-brand');
 
 let currentGame = null;
+
+window.addEventListener('passatempo:home', showHome);
 
 topbarBrand.addEventListener('click', event => {
   event.preventDefault();

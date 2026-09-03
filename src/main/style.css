@@ -577,8 +577,10 @@ body.drawer-open { overflow: hidden; }
 }
 
 .card-btn {
-  align-self: flex-start;
-  padding: 0.55rem 1.1rem;
+  align-self: center;
+  min-height: 44px;
+  min-width: 128px;
+  padding: 0.55rem 1.25rem;
   font-family: var(--font-sans);
   font-size: 15px;
   font-weight: 500;
@@ -721,6 +723,84 @@ body.drawer-open { overflow: hidden; }
 .game-action-btn.active {
   background: var(--brown-pastel);
   border-color: var(--brown-light);
+}
+
+/* ── Jogos de Matemática ────────────────────────────────── */
+.math-game {
+  width: min(100%, 520px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  text-align: center;
+}
+
+.math-game--intro,
+.math-game--result { padding: 1rem 0; }
+.math-game h3 { font-family: var(--font-serif); font-size: 1.8rem; color: var(--text-strong); }
+.game-eyebrow { color: var(--accent); font-size: 0.74rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+.math-game p { color: var(--text-muted); max-width: 42ch; }
+.game-record { font-size: 0.8rem; }
+.math-select-label { align-self: flex-start; width: min(100%, 280px); color: var(--text-muted); font-size: 0.8rem; text-align: left; }
+.math-select { width: min(100%, 280px); min-height: 44px; padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text-strong); font: 0.9rem var(--font-sans); }
+.math-primary { background: var(--surface-brown); color: var(--on-brown); border-color: var(--surface-brown); }
+.math-primary:hover { background: var(--accent); color: var(--on-brown); border-color: var(--accent); }
+.math-game-stats { display: flex; justify-content: space-between; gap: 4rem; width: 100%; color: var(--text-muted); font-size: 0.82rem; }
+.math-game-stats strong { display: block; color: var(--text-strong); font-family: var(--font-serif); font-size: 1.2rem; }
+.math-question { color: var(--text-strong); font-family: var(--font-serif); font-size: clamp(2rem, 7vw, 3.4rem); line-height: 1.15; }
+.math-answer-form { display: flex; width: 100%; max-width: 360px; gap: 0.65rem; }
+.math-answer { min-width: 0; flex: 1; min-height: 46px; padding: 0.55rem 0.75rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text-strong); font: 1.1rem var(--font-sans); text-align: center; }
+.math-answer:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.math-feedback { min-height: 1.5em; font-size: 0.82rem; }
+.math-feedback[data-state="correct"] { color: #4A8F4A; }
+.math-feedback[data-state="wrong"] { color: #BB5555; }
+.result-score { color: var(--text-strong); font: 700 2rem var(--font-serif); }
+.result-list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); width: 100%; border-top: 1px solid var(--divider); border-bottom: 1px solid var(--divider); padding: 1rem 0; }
+.result-list div { display: grid; gap: 0.2rem; }
+.result-list dt { color: var(--text-muted); font-size: 0.72rem; }
+.result-list dd { color: var(--text-strong); font-family: var(--font-serif); font-size: 1.15rem; }
+.result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.65rem; }
+.number-target { color: var(--text-strong); font: 700 clamp(2.6rem, 8vw, 4rem) var(--font-serif); line-height: 1; }
+.number-expression { width: 100%; min-height: 2.2rem; padding: 0.55rem; border-bottom: 1px solid var(--divider); color: var(--text-strong) !important; font: 1.15rem var(--font-serif); }
+.number-choices, .number-operators { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.6rem; }
+.number-choice, .number-operator { min-width: 48px; }
+.number-operator { font-size: 1.1rem; }
+.number-choice:disabled, .number-operator:disabled, .number-check:disabled { cursor: not-allowed; opacity: 0.45; transform: none; }
+
+/* ── Jogos de Palavras ──────────────────────────────────── */
+.word-game { width: min(100%, 620px); display: flex; flex-direction: column; align-items: center; gap: 1.25rem; text-align: center; }
+.word-game h3 { font-family: var(--font-serif); font-size: 1.8rem; color: var(--text-strong); }
+.word-game-intro p { color: var(--text-muted); max-width: 48ch; }
+.crossword-layout, .word-search-layout { display: flex; align-items: flex-start; justify-content: center; gap: 2rem; width: 100%; }
+.crossword-grid { display: grid; grid-template-columns: repeat(7, 38px); grid-template-rows: repeat(7, 38px); border: 2px solid var(--brown-light); background: var(--brown-light); gap: 1px; }
+.crossword-cell, .crossword-block { width: 38px; height: 38px; }
+.crossword-cell { border: 0; background: var(--bg); color: var(--text-strong); font: 700 1.1rem var(--font-serif); cursor: pointer; }
+.crossword-cell.is-selected { outline: 3px solid var(--accent); outline-offset: -3px; }
+.crossword-block { background: var(--surface-brown); }
+.crossword-clues { max-width: 230px; margin: 0; padding-left: 1.3rem; color: var(--text); text-align: left; font-size: 0.82rem; }
+.crossword-clues li { margin-bottom: 0.8rem; }
+.crossword-clues strong { color: var(--accent); }
+.word-feedback { min-height: 1.5em; color: var(--text-muted); font-size: 0.82rem; }
+.word-search-grid { display: grid; grid-template-columns: repeat(10, 32px); grid-template-rows: repeat(10, 32px); gap: 2px; touch-action: none; }
+.word-search-cell { border: 1px solid var(--border); background: var(--bg); color: var(--text-strong); font: 700 0.85rem var(--font-serif); cursor: pointer; padding: 0; }
+.word-search-cell.is-found { background: var(--brown-pastel); color: var(--text-strong); }
+.word-list { display: grid; gap: 0.55rem; margin: 0; padding: 0; list-style: none; color: var(--text-muted); font-size: 0.82rem; text-align: left; }
+.word-list li.is-found { color: var(--text-strong); text-decoration: line-through; }
+.hangman-word { min-height: 2.6rem; color: var(--text-strong); font: 700 1.8rem var(--font-serif); letter-spacing: 0.2em; }
+.hangman-attempts { color: var(--text-muted); font-size: 0.85rem; }
+.hangman-keyboard { display: grid; grid-template-columns: repeat(7, minmax(36px, 1fr)); gap: 0.4rem; width: min(100%, 420px); }
+.hangman-key { min-width: 0; padding: 0.4rem; }
+.hangman-key:disabled { cursor: not-allowed; opacity: 0.42; transform: none; }
+
+@media (max-width: 600px) {
+  .crossword-layout, .word-search-layout { flex-direction: column; align-items: center; gap: 1.25rem; }
+  .crossword-grid { grid-template-columns: repeat(7, 32px); grid-template-rows: repeat(7, 32px); }
+  .crossword-cell, .crossword-block { width: 32px; height: 32px; }
+  .crossword-clues { width: min(100%, 280px); }
+  .word-search-grid { grid-template-columns: repeat(10, 28px); grid-template-rows: repeat(10, 28px); }
+  .word-search-cell { font-size: 0.75rem; }
+  .word-list { width: min(100%, 280px); grid-template-columns: repeat(2, 1fr); }
+  .result-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
 }
 
 /* ── Jogo da Velha ──────────────────────────────────────── */
