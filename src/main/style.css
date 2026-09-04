@@ -383,6 +383,7 @@ body.drawer-open { overflow: hidden; }
 
 /* ── Header / Hero ───────────────────────────────────────── */
 .site-header {
+  position: relative;
   text-align: center;
   padding: 4.75rem 2rem 3.25rem;
   background: var(--surface-brown);
@@ -391,6 +392,16 @@ body.drawer-open { overflow: hidden; }
   box-shadow: var(--shadow-md);
   margin-bottom: 2.25rem;
   transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
+}
+
+.site-title-mark {
+  position: absolute;
+  top: 50%;
+  left: 2.5rem;
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  transform: translateY(-50%);
 }
 
 .site-title {
@@ -1326,6 +1337,15 @@ body.drawer-open { overflow: hidden; }
 
   .site-header {
     padding: 3.5rem 1.25rem 2rem;
+  }
+
+  .site-title-mark {
+    position: static;
+    display: block;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 0.5rem;
+    transform: none;
   }
 
   .site-title { font-size: 34px; }
