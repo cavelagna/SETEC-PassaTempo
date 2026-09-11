@@ -80,10 +80,11 @@ const Memory = (() => {
   }
 
   function getCardEl(id) {
-    return container.querySelector(`.mem-card[data-id="${id}"]`);
+    return container?.querySelector(`.mem-card[data-id="${id}"]`);
   }
 
   function refreshCard(id) {
+    if (!container || !cards) return;
     const card = cards[id];
     const el   = getCardEl(id);
     if (!el) return;
@@ -155,6 +156,7 @@ const Memory = (() => {
   }
 
   function showWin() {
+    if (!container) return;
     const wrap = container.querySelector('.mem-wrap');
     if (!wrap) return;
     const msg = document.createElement('p');

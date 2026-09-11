@@ -75,10 +75,22 @@
           </svg>
         </button>
 
+        <button class="a11y-btn notification-toggle" id="btn-notifications" aria-label="Desativar avisos de acessibilidade" aria-pressed="true" title="Avisos de acessibilidade">
+          <svg class="notification-bell" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="none">
+            <path d="M3.5 11.5h9l-1.1-1.6V6.8a3.4 3.4 0 0 0-6.8 0v3.1L3.5 11.5Z" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+            <path d="M6.4 13.2a1.7 1.7 0 0 0 3.2 0" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+          </svg>
+        </button>
+
       </div>
     </div>
   </nav>
   <!-- ─── /Barra de navegação ─────────────────────────────── -->
+
+  <aside class="a11y-tip" id="a11y-tip" role="status" aria-live="polite" hidden>
+    <p>Está com dificuldade? Veja estas ferramentas.</p>
+    <button class="a11y-tip-close" id="a11y-tip-close" type="button" aria-label="Fechar aviso">×</button>
+  </aside>
 
   <!-- Drawer de categorias: permanece no DOM para a animação de abertura -->
   <div class="drawer-backdrop" id="drawer-backdrop" aria-hidden="true"></div>
@@ -110,8 +122,8 @@
         <ul class="drawer-games"><li><a href="#categoria-palavras" data-game="crossword">Palavras Cruzadas</a></li><li><a href="#categoria-palavras" data-game="wordsearch">Caça-Palavras</a></li><li><a href="#categoria-palavras" data-game="hangman">Forca</a></li></ul>
       </div>
       <div class="drawer-group">
-        <button class="drawer-category" type="button" aria-expanded="false">Em planejamento</button>
-        <ul class="drawer-games"><li><a href="#categoria-planejamento">Colorir</a></li><li><a href="#categoria-planejamento">Block Puzzle</a></li><li><a href="#categoria-planejamento">Breakout</a></li><li><a href="#categoria-planejamento">Quiz</a></li></ul>
+        <button class="drawer-category" type="button" aria-expanded="false">Criatividade</button>
+        <ul class="drawer-games"><li><a href="#categoria-criatividade" data-game="colorir">Colorir</a></li><li><a href="#categoria-planejamento">Block Puzzle</a></li><li><a href="#categoria-planejamento">Breakout</a></li><li><a href="#categoria-planejamento">Quiz</a></li></ul>
       </div>
     </nav>
   </aside>
@@ -301,12 +313,12 @@
         </section>
 
         <!-- ── EM PLANEJAMENTO ── -->
-        <section class="cat-section" id="categoria-planejamento" aria-labelledby="lbl-planejamento">
-          <h2 class="cat-heading" id="lbl-planejamento">Em planejamento</h2>
+        <section class="cat-section" id="categoria-criatividade" aria-labelledby="lbl-criatividade">
+          <h2 class="cat-heading" id="lbl-criatividade">Criatividade</h2>
           <div class="cards-grid">
-            <article class="game-card game-card--soon" data-tags="colorir desenho infantil criatividade cores arte">
+            <article class="game-card" data-game="colorir" data-tags="colorir desenho infantil criatividade cores arte">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="m14 4 6 6M4 20l1.5-5.5L16.5 3.5a2.1 2.1 0 0 1 3 3L8.5 18.5zM13 7l4 4"/><path d="M4 20h16"/></svg><div class="card-info"><span class="card-category">Criatividade</span><h3 class="card-title">Colorir</h3><span class="card-meta">Dificuldade: Fácil</span></div></div>
-              <p class="card-desc">Escolha uma ilustração e experimente cores em uma atividade tranquila para todas as idades.</p><span class="card-soon-badge">Em breve</span>
+              <p class="card-desc">Escolha uma ilustração e experimente cores em uma atividade tranquila para todas as idades.</p><button class="card-btn" data-game="colorir" aria-label="Jogar Colorir">Jogar</button>
             </article>
             <article class="game-card game-card--soon" data-tags="block puzzle blocos logica estrategia encaixe">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Block Puzzle</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
@@ -332,12 +344,12 @@
     <!-- ════ VIEW: GAME ════ -->
     <div id="view-game" class="view" hidden>
       <div class="game-view-top">
-        <button class="back-btn" id="back-btn" aria-label="Voltar ao catálogo de jogos">
+        <button class="back-btn" id="back-btn" aria-label="Clique aqui para voltar para o início" title="Clique aqui para voltar para o início">
           <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"
                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
             <polyline points="9,2 4,7 9,12"/>
           </svg>
-          Voltar
+          Clique aqui para voltar para o início
         </button>
         <h2 class="game-running-title" id="game-running-title"></h2>
       </div>
@@ -369,6 +381,7 @@
   <script src="games/cobra.js"></script>
   <script src="games/sudoku.js"></script>
   <script src="games/2048.js"></script>
+  <script src="games/colorir.js"></script>
 
   <!-- Orquestrador principal -->
   <script src="script.js"></script>

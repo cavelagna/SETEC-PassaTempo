@@ -178,9 +178,11 @@ const TwoThousandFortyEight = (() => {
       targetReached = true;
       phase = 'won';
       setStatus('Você chegou ao 2048! Continue jogando ou comece uma nova partida.');
+      window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'win' } }));
     } else if (!canMove()) {
       phase = 'lost';
       setStatus('Fim de jogo. Não há mais movimentos possíveis.');
+      window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'loss' } }));
     }
 
     render({ previousBoard, direction });
@@ -301,7 +303,7 @@ const TwoThousandFortyEight = (() => {
         if (!value) return;
         const tile = document.createElement('div');
         const track = trackByDestination.get(`${rowIndex}:${columnIndex}`);
-        tile.className = `two048-tile two048-tile--${value}`;
+        tile.className = `two048-tile${track?.merged ? ' merged' : ''} two048-tile--${value}`;
         tile.setAttribute('role', 'gridcell');
         tile.setAttribute('aria-label', `Linha ${rowIndex + 1}, coluna ${columnIndex + 1}: ${formatTileLabel(value)}`);
         tile.textContent = value;
@@ -359,11 +361,18 @@ const TwoThousandFortyEight = (() => {
       tile.style.transition = 'none';
 
       if (typeof tile.animate === 'function') {
-        const animation = tile.animate(
-          [
+        const keyframes = tile.classList.contains('merged')
+          ? [
+            { transform: initialTransform, offset: 0 },
+            { transform: 'translate(0, 0) scale(1.16)', offset: 0.7 },
+            { transform: 'translate(0, 0) scale(1)', offset: 1 },
+          ]
+          : [
             { transform: initialTransform },
             { transform: 'translate(0, 0) scale(1)' },
-          ],
+          ];
+        const animation = tile.animate(
+          keyframes,
           { duration: MOVE_ANIMATION_MS, easing: 'ease-out', fill: 'forwards' },
         );
         animation.onfinish = () => {

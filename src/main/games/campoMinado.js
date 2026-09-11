@@ -97,6 +97,7 @@ const Minesweeper = (() => {
     if (cell.mine) {
       gameState = 'lost';
       clearInterval(timerInterval);
+      window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'loss' } }));
       return;
     }
 
@@ -110,6 +111,7 @@ const Minesweeper = (() => {
     if (revealed === rows * cols - mineCount) {
       gameState = 'won';
       clearInterval(timerInterval);
+      window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'win' } }));
     }
   }
 
@@ -240,6 +242,14 @@ const Minesweeper = (() => {
     refreshAll();
   }
 
+  function difficultyScreen() {
+    container.innerHTML = `<div class="word-game difficulty-screen ms-difficulty-screen"><p class="game-eyebrow">Escolha o desafio</p><h3>Campo Minado</h3><p>Escolha o tamanho do tabuleiro antes de começar.</p><div class="difficulty-options">${Object.entries(CONFIGS).map(([key, cfg]) => `<button class="game-action-btn" data-diff-choice="${key}"><strong>${key === 'beginner' ? 'Fácil' : 'Intermediário'}</strong><span>${cfg.label}</span></button>`).join('')}</div></div>`;
+    container.querySelectorAll('[data-diff-choice]').forEach(button => button.addEventListener('click', () => {
+      init(button.dataset.diffChoice);
+      buildDOM();
+    }));
+  }
+
   function refreshCell(btn, cell) {
     btn.className = 'ms-cell';
     btn.textContent = '';
@@ -309,8 +319,7 @@ const Minesweeper = (() => {
 
   function mount(el) {
     container = el;
-    init('beginner');
-    buildDOM();
+    difficultyScreen();
   }
 
   function unmount() {

@@ -15,6 +15,7 @@ const GAMES = {
   tictactoe:   { module: TicTacToe,  title: 'Jogo da Velha' },
   snake:       { module: Snake,       title: 'Snake'         },
   two048:      { module: TwoThousandFortyEight, title: '2048' },
+  colorir:     { module: Colorir,    title: 'Colorir' },
 };
 
 // ── Referências DOM ───────────────────────────────────────
@@ -31,8 +32,75 @@ const drawerBackdrop = document.getElementById('drawer-backdrop');
 const drawerClose   = document.getElementById('drawer-close');
 const htmlEl       = document.documentElement;
 const topbarBrand   = document.querySelector('.topbar-brand');
+const notificationButton = document.getElementById('btn-notifications');
+const accessibilityTip = document.getElementById('a11y-tip');
+const accessibilityTipClose = document.getElementById('a11y-tip-close');
 
 let currentGame = null;
+const OVERLAY_GAMES = new Set(['two048', 'crossword', 'wordsearch']);
+
+let notificationsEnabled = true;
+try { notificationsEnabled = localStorage.getItem('pt-a11y-notifications') !== 'false'; } catch (_) {}
+
+function updateNotificationButton() {
+  notificationButton.setAttribute('aria-pressed', String(notificationsEnabled));
+  notificationButton.setAttribute('aria-label', notificationsEnabled ? 'Desativar avisos de acessibilidade' : 'Ativar avisos de acessibilidade');
+  notificationButton.classList.toggle('is-muted', !notificationsEnabled);
+}
+
+function showAccessibilityTip() {
+  if (!notificationsEnabled || !accessibilityTip) return;
+  accessibilityTip.hidden = false;
+  accessibilityTip.classList.remove('is-visible');
+  requestAnimationFrame(() => accessibilityTip.classList.add('is-visible'));
+}
+
+function closeAccessibilityTip() {
+  if (!accessibilityTip) return;
+  accessibilityTip.classList.remove('is-visible');
+  window.setTimeout(() => { accessibilityTip.hidden = true; }, 180);
+}
+
+notificationButton.addEventListener('click', () => {
+  notificationsEnabled = !notificationsEnabled;
+  try { localStorage.setItem('pt-a11y-notifications', String(notificationsEnabled)); } catch (_) {}
+  updateNotificationButton();
+  if (!notificationsEnabled) closeAccessibilityTip();
+  else showAccessibilityTip();
+});
+accessibilityTipClose.addEventListener('click', closeAccessibilityTip);
+updateNotificationButton();
+showAccessibilityTip();
+window.setInterval(showAccessibilityTip, 5 * 60 * 1000);
+
+function showGameResult(result) {
+  if (!gameArea || !OVERLAY_GAMES.has(currentGame) || gameArea.querySelector('.game-result-overlay')) return;
+  const won = result === 'win';
+  const overlay = document.createElement('div');
+  overlay.className = `game-result-overlay ${won ? 'is-win' : 'is-loss'}`;
+  overlay.setAttribute('role', 'status');
+  overlay.setAttribute('aria-live', 'assertive');
+  overlay.innerHTML = `<strong>${won ? 'Você venceu!' : 'Você perdeu.'}</strong>`;
+  gameArea.appendChild(overlay);
+}
+
+window.addEventListener('passatempo:result', event => showGameResult(event.detail?.result));
+
+function clearGameResult() {
+  gameArea?.querySelector('.game-result-overlay')?.remove();
+}
+
+const resultObserver = new MutationObserver(mutations => {
+  if (!viewGame || viewGame.hidden || !currentGame || !OVERLAY_GAMES.has(currentGame)) return;
+  const text = mutations.map(mutation => mutation.target.textContent || '').join(' ');
+  if (/você venceu|parabéns|venceu!/i.test(text)) showGameResult('win');
+  if (/você perdeu|fim de jogo/i.test(text)) showGameResult('loss');
+});
+resultObserver.observe(gameArea, { childList: true, subtree: true, characterData: true });
+
+gameArea.addEventListener('click', event => {
+  if (event.target.closest('.two048-restart, .crossword-restart, .word-search-restart')) clearGameResult();
+});
 
 window.addEventListener('passatempo:home', showHome);
 
@@ -72,6 +140,7 @@ function showGame(id) {
   gameTitle.textContent = entry.title;
   document.title = `${entry.title} — PassaTempo`;
 
+  clearGameResult();
   gameArea.innerHTML = '';
   entry.module.mount(gameArea);
 

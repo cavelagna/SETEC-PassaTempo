@@ -88,6 +88,7 @@ const Snake = (() => {
   function endGame() {
     gameState = 'lost';
     clearInterval(intervalId);
+    window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'loss' } }));
     updateStartButton();
     draw(); // renderiza overlay de game over
   }
