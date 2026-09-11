@@ -1,7 +1,14 @@
 'use strict';
 
 const Hangman = (() => {
-  const WORDS = ['ESCOLA', 'CADERNO', 'LEITURA', 'JANELA', 'DESAFIO', 'AMIZADE', 'PLANETA'];
+  const WORDS = [
+    'ESCOLA', 'CADERNO', 'LEITURA', 'JANELA', 'DESAFIO', 'AMIZADE', 'PLANETA',
+    'COMPUTADOR', 'TECNOLOGIA', 'BRINCADEIRA', 'AVENTURA', 'NATUREZA', 'ANIMAL',
+    'MUSICA', 'HISTORIA', 'CIENCIA', 'LIVRO', 'CINEMA', 'FAMILIA', 'CORAGEM',
+    'SORRISO', 'CAMINHO', 'MONTANHA', 'OCEANO', 'FLORESTA', 'CHOCOLATE',
+    'BICICLETA', 'TELEFONE', 'INTERNET', 'AMARELO', 'VERDADE', 'MEMORIA',
+    'PRESENTE', 'VIAGEM', 'ESCOLHA', 'CRIATIVIDADE', 'PASSATEMPO',
+  ];
   let container, word, used, misses, keyHandler;
 
   function render() {

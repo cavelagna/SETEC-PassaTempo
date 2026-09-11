@@ -14,6 +14,7 @@ const GAMES = {
   memory:      { module: Memory,      title: 'Jogo da Memória' },
   tictactoe:   { module: TicTacToe,  title: 'Jogo da Velha' },
   snake:       { module: Snake,       title: 'Snake'         },
+  two048:      { module: TwoThousandFortyEight, title: '2048' },
 };
 
 // ── Referências DOM ───────────────────────────────────────
