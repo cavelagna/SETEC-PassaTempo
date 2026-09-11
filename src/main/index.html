@@ -109,6 +109,10 @@
         <button class="drawer-category" type="button" aria-expanded="false">Palavras</button>
         <ul class="drawer-games"><li><a href="#categoria-palavras" data-game="crossword">Palavras Cruzadas</a></li><li><a href="#categoria-palavras" data-game="wordsearch">Caça-Palavras</a></li><li><a href="#categoria-palavras" data-game="hangman">Forca</a></li></ul>
       </div>
+      <div class="drawer-group">
+        <button class="drawer-category" type="button" aria-expanded="false">Em planejamento</button>
+        <ul class="drawer-games"><li><a href="#categoria-planejamento">Colorir</a></li><li><a href="#categoria-planejamento">Block Puzzle</a></li><li><a href="#categoria-planejamento">Breakout</a></li><li><a href="#categoria-planejamento">Quiz</a></li></ul>
+      </div>
     </nav>
   </aside>
 
@@ -296,6 +300,29 @@
           </div>
         </section>
 
+        <!-- ── EM PLANEJAMENTO ── -->
+        <section class="cat-section" id="categoria-planejamento" aria-labelledby="lbl-planejamento">
+          <h2 class="cat-heading" id="lbl-planejamento">Em planejamento</h2>
+          <div class="cards-grid">
+            <article class="game-card game-card--soon" data-tags="colorir desenho infantil criatividade cores arte">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="m14 4 6 6M4 20l1.5-5.5L16.5 3.5a2.1 2.1 0 0 1 3 3L8.5 18.5zM13 7l4 4"/><path d="M4 20h16"/></svg><div class="card-info"><span class="card-category">Criatividade</span><h3 class="card-title">Colorir</h3><span class="card-meta">Dificuldade: Fácil</span></div></div>
+              <p class="card-desc">Escolha uma ilustração e experimente cores em uma atividade tranquila para todas as idades.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="block puzzle blocos logica estrategia encaixe">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Block Puzzle</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <p class="card-desc">Encaixe peças na grade, complete linhas e organize cada movimento para fazer mais pontos.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="breakout arcade classico reflexo blocos">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 5h5v4H4zM10 5h5v4h-5zM16 5h4v4h-4zM7 11h5v4H7zM13 11h5v4h-5z"/><path d="M4 20h16M12 17v3"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Breakout</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <p class="card-desc">Rebata a bola e destrua os blocos sem deixar que ela escapar pela parte inferior.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+            <article class="game-card game-card--soon" data-tags="quiz perguntas conhecimentos infantil desafio">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 1 1 4.2 2c-1.1.8-1.7 1.2-1.7 2.5M12 17h.01" stroke-linecap="round" stroke-width="1.8"/></svg><div class="card-info"><span class="card-category">Desafios</span><h3 class="card-title">Quiz</h3><span class="card-meta">Dificuldade: Variável</span></div></div>
+              <p class="card-desc">Responda perguntas de temas variados e descubra quanto você consegue acertar.</p><span class="card-soon-badge">Em breve</span>
+            </article>
+          </div>
+        </section>
+
       </div>
       <!-- /catalog -->
 
@@ -330,16 +357,16 @@
   </footer>
 
   <!-- Módulos dos jogos (carregados antes do orquestrador) -->
-  <script src="games/quickCalc.js"></script>
-  <script src="games/timesTable.js"></script>
-  <script src="games/numberChallenge.js"></script>
-  <script src="games/crossword.js"></script>
-  <script src="games/wordSearch.js"></script>
-  <script src="games/hangman.js"></script>
-  <script src="games/ticTacToe.js"></script>
-  <script src="games/memory.js"></script>
-  <script src="games/minesweeper.js"></script>
-  <script src="games/snake.js"></script>
+  <script src="games/calculoRapido.js"></script>
+  <script src="games/tabuada.js"></script>
+  <script src="games/desafioNumerico.js"></script>
+  <script src="games/palavrasCruzadas.js"></script>
+  <script src="games/cacaPalavras.js"></script>
+  <script src="games/forca.js"></script>
+  <script src="games/jogoDaVelha.js"></script>
+  <script src="games/jogoDaMemoria.js"></script>
+  <script src="games/campoMinado.js"></script>
+  <script src="games/cobra.js"></script>
   <script src="games/sudoku.js"></script>
 
   <!-- Orquestrador principal -->
