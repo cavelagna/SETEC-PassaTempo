@@ -4,7 +4,7 @@ const WordSearch = (() => {
   let size = 10;
   const LEVELS = { easy: 5, medium: 10, hard: 15 };
   const LABELS = { easy: 'Fácil', medium: 'Médio', hard: 'Difícil' };
-  const WORDS = ['ESCOLA', 'LIVRO', 'JOGO', 'IDEIA', 'AMIZADE', 'LEITURA', 'DESAFIO', 'MUSICA', 'ARTE', 'CIENCIA', 'NATUREZA', 'AVENTURA', 'FAMILIA', 'PLANETA', 'SORRISO', 'CAMINHO', 'OCEANO', 'FLORESTA', 'MEMORIA', 'CORAGEM', 'CINEMA', 'VIAGEM', 'TELEFONE', 'JANELA', 'BRINCADEIRA', 'CRIATIVIDADE', 'PASSATEMPO', 'ESCOLHA', 'HISTORIA', 'MONTANHA'];
+  const WORDS = ['ESCOLA', 'LIVRO', 'JOGO', 'IDEIA', 'AMIZADE', 'LEITURA', 'DESAFIO', 'MUSICA', 'ARTE', 'CIENCIA', 'NATUREZA', 'AVENTURA', 'FAMILIA', 'PLANETA', 'SORRISO', 'CAMINHO', 'OCEANO', 'FLORESTA', 'MEMORIA', 'CORAGEM', 'CINEMA', 'VIAGEM', 'TELEFONE', 'JANELA', 'BRINCADEIRA', 'CRIATIVIDADE', 'PASSATEMPO', 'ESCOLHA', 'HISTORIA', 'MONTANHA', 'BICICLETA', 'BIBLIOTECA', 'BORBOLETA', 'CACHORRO', 'GIRASSOL', 'CHOCOLATE', 'CIDADE', 'COELHO', 'COMPUTADOR', 'CULTURA', 'DESENHO', 'DINOSSAURO', 'ESPERANCA', 'ESTRELA', 'FANTASIA', 'FUTEBOL', 'GALAXIA', 'GUITARRA', 'INVERNO', 'JARDIM', 'LARANJA', 'LAPIS', 'LIBERDADE', 'LIMONADA', 'LIVRARIA', 'MAQUINA', 'MELANCIA', 'MISTERIO', 'NAVEGACAO', 'ORQUESTRA', 'PINTURA', 'PIPOCA', 'PRAIA', 'PRESENTE', 'PRIMAVERA', 'QUEBRACABECA', 'RAIO', 'RELOGIO', 'SABEDORIA', 'SAPO', 'SEGREDO', 'SEMENTE', 'SORVETE', 'TEATRO', 'TESOURO', 'TIGRE', 'UNIVERSO', 'VERAO', 'VIOLETA', 'VULCAO', 'XILOFONE'];
   const DIRECTIONS = [[0, 1], [1, 0], [1, 1], [0, -1], [-1, 0], [-1, -1], [1, -1], [-1, 1]];
   let container, grid, placements, found, start, current, difficulty;
 
@@ -16,8 +16,7 @@ const WordSearch = (() => {
   function sizeFor(level) { return level === 'easy' ? 10 : level === 'medium' ? 12 : 15; }
 
   function wordsFor(level) {
-    const model = Math.floor(Math.random() * 8);
-    return Array.from({ length: LEVELS[level] }, (_, index) => WORDS[(model * 3 + index) % WORDS.length]);
+    return [...WORDS].sort(() => Math.random() - 0.5).slice(0, LEVELS[level]);
   }
 
   function placeWord(word, board, random) {

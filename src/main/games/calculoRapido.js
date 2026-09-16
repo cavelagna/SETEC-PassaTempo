@@ -1,8 +1,8 @@
 'use strict';
 
 const QuickCalc = (() => {
-  const ROUND_SECONDS = 60;
-  let container, timerId, state, question, startedAt;
+  const ROUND_SECONDS = 90;
+  let container, timerId, state, question, previousQuestion;
 
   function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -16,7 +16,8 @@ const QuickCalc = (() => {
     if (type === 1) { a = randomInt(8, 18 + level * 6); b = randomInt(2, a); answer = a - b; symbol = '-'; }
     if (type === 2) { a = randomInt(2, 5 + level * 2); b = randomInt(2, 6 + level * 2); answer = a * b; symbol = '×'; }
     if (type === 3) { b = randomInt(2, 5 + level); answer = randomInt(2, 6 + level) * b; a = answer; answer = a / b; symbol = '÷'; }
-    return { text: `${a} ${symbol} ${b}`, answer };
+    const nextQuestion = { text: `${a} ${symbol} ${b}`, answer };
+    return nextQuestion.text === previousQuestion?.text ? makeQuestion(correct) : nextQuestion;
   }
 
   function readRecord() {
@@ -32,7 +33,7 @@ const QuickCalc = (() => {
   function renderStart() {
     container.innerHTML = `<div class="math-game math-game--intro">
       <p class="game-eyebrow">Desafio de cálculo mental</p><h3>Cálculo Rápido</h3>
-      <p>Resolva o maior número possível de contas em 60 segundos.</p>
+      <p>Resolva o maior número possível de contas em 90 segundos.</p>
       <button class="game-action-btn math-primary quick-start">Começar</button>
       <p class="game-record">Melhor pontuação: ${readRecord()}</p>
     </div>`;
@@ -53,7 +54,9 @@ const QuickCalc = (() => {
   function start() {
     clearInterval(timerId);
     state = { time: ROUND_SECONDS, score: 0, correct: 0, wrong: 0, total: 0, locked: false };
+    previousQuestion = null;
     question = makeQuestion(0);
+    previousQuestion = question;
     renderRound();
     timerId = setInterval(() => { state.time--; const time = container.querySelector('.quick-time'); if (time) time.textContent = state.time; if (state.time <= 0) finish(); }, 1000);
   }
@@ -69,7 +72,7 @@ const QuickCalc = (() => {
     if (correct) { state.correct++; state.score += 10 + Math.max(0, Math.floor(state.time / 10)); feedback.textContent = 'Correto. Próxima conta...'; feedback.dataset.state = 'correct'; }
     else { state.wrong++; feedback.textContent = `Ainda não. A resposta era ${question.answer}.`; feedback.dataset.state = 'wrong'; }
     state.total++;
-    setTimeout(() => { if (!state || state.time <= 0) return; state.locked = false; question = makeQuestion(state.correct); renderRound(); }, 450);
+    setTimeout(() => { if (!state || state.time <= 0) return; state.locked = false; question = makeQuestion(state.correct); previousQuestion = question; renderRound(); }, 450);
   }
 
   function finish() {
@@ -82,6 +85,6 @@ const QuickCalc = (() => {
   }
 
   function mount(el) { container = el; state = null; renderStart(); }
-  function unmount() { clearInterval(timerId); timerId = null; state = null; question = null; if (container) container.innerHTML = ''; container = null; }
+  function unmount() { clearInterval(timerId); timerId = null; state = null; question = null; previousQuestion = null; if (container) container.innerHTML = ''; container = null; }
   return { mount, unmount };
 })();

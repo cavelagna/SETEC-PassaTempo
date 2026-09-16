@@ -864,25 +864,74 @@ body.drawer-open { overflow: hidden; }
   border-color: var(--brown-light);
 }
 
+/* ── Paciência ──────────────────────────────────────────── */
+.sol-game { width: min(100%, 900px); margin-inline: auto; display: grid; gap: 1rem; }
+.sol-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.sol-header h3 { color: var(--text-strong); font: 700 1.8rem var(--font-serif); }
+.sol-help { color: var(--text-muted); font-size: .82rem; text-align: center; }
+.sol-top { display: grid; grid-template-columns: 72px 72px 1fr auto; gap: .75rem; align-items: start; }
+.sol-stock, .sol-waste, .sol-foundations > div { width: 72px; height: 96px; }
+.sol-foundations { display: flex; gap: .55rem; }
+.sol-card, .sol-slot, .sol-empty { width: 72px; height: 96px; border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.sol-card { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; padding: .35rem .4rem; background: var(--bg-card); color: var(--text-strong); cursor: pointer; font: 700 1rem var(--font-sans); box-shadow: var(--shadow-sm); }
+.sol-card b { align-self: center; font-size: 1.8rem; font-weight: 500; line-height: 1; }
+.sol-card i { align-self: flex-end; font-size: .9rem; font-style: normal; transform: rotate(180deg); }
+.sol-card--red { color: #b44f4b; }
+.sol-card--back { border-color: var(--surface-brown); background: repeating-linear-gradient(135deg, var(--surface-brown), var(--surface-brown) 7px, var(--accent) 7px, var(--accent) 9px); }
+.sol-slot, .sol-empty { border: 1px dashed var(--border); background: color-mix(in srgb, var(--surface-brown) 8%, transparent); }
+.sol-foundation { background: transparent; border-style: dashed; }
+.sol-card.is-selected { outline: 3px solid var(--accent); outline-offset: 2px; }
+.sol-tableau { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .65rem; align-items: start; }
+.sol-tableau-pile { position: relative; min-height: 300px; }
+.sol-tableau-card { position: absolute; left: 0; right: 0; min-height: 96px; }
+.sol-tableau-card .sol-card, .sol-tableau-card .sol-card--back { position: absolute; top: 0; left: 50%; transform: translateX(-50%); }
+.sol-tableau-card .sol-empty { position: absolute; left: 50%; transform: translateX(-50%); }
+.sol-tableau-card .sol-card.is-selected { z-index: 2; }
+
+@media (max-width: 620px) {
+  .sol-top { grid-template-columns: repeat(2, 72px); justify-content: center; }
+  .sol-spacer { display: none; }
+  .sol-foundations { grid-column: 1 / -1; justify-content: center; }
+  .sol-tableau { gap: .2rem; }
+  .sol-card, .sol-slot, .sol-empty, .sol-stock, .sol-waste, .sol-foundations > div { width: 42px; height: 60px; }
+  .sol-card { padding: .18rem .2rem; font-size: .72rem; }
+  .sol-card b { font-size: 1.15rem; }
+  .sol-card i { font-size: .62rem; }
+  .sol-tableau-card { min-height: 60px; }
+  .sol-tableau-pile { min-height: 220px; }
+}
+
 /* ── 2048 ───────────────────────────────────────────────── */
 
-/* Palette for Colorir game */
-.colorir-palette {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  justify-content: center;
-}
-.colorir-swatch {
-  width: 32px;
-  height: 32px;
-  border: 2px solid var(--border);
-  border-radius: 4px;
-  cursor: pointer;
-}
-.colorir-swatch.is-selected {
-  outline: 2px solid var(--accent);
-}
+/* ── Colorir por números ───────────────────────────────── */
+.colorir-game { width: min(100%, 760px); display: grid; gap: 1rem; margin-inline: auto; }
+.colorir-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+.colorir-heading h3 { color: var(--text-strong); font: 700 1.55rem var(--font-serif); }
+.colorir-heading p:not(.game-eyebrow) { color: var(--text-muted); font-size: .84rem; }
+.colorir-progress { flex: none; border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); font-size: .78rem; padding: .3rem .65rem; white-space: nowrap; }
+.colorir-choice, .colorir-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .5rem; }
+.colorir-drawing-btn { background: var(--bg-card); border: 1px solid var(--border); border-radius: 999px; color: var(--text); cursor: pointer; font: .74rem var(--font-sans); padding: .42rem .7rem; }
+.colorir-drawing-btn:hover, .colorir-drawing-btn.is-active { background: var(--divider); border-color: var(--brown-light); color: var(--text-strong); }
+.colorir-canvas { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow-sm); display: grid; place-items: center; padding: clamp(.5rem, 2vw, 1.25rem); }
+.colorir-art { width: min(100%, 430px); max-height: 440px; overflow: visible; }
+.colorir-piece { --piece-color: var(--bg); fill: var(--piece-color); stroke: var(--text-strong); stroke-linejoin: round; stroke-width: 2.4; cursor: pointer; transition: fill var(--transition), filter var(--transition), stroke-width var(--transition); }
+.colorir-piece.is-target { filter: drop-shadow(0 0 4px var(--accent)); stroke: var(--accent); stroke-width: 3.5; }
+.colorir-piece.is-painted { filter: none; stroke: var(--text-strong); }
+.colorir-piece.is-wrong { animation: colorir-shake 280ms ease; stroke: #bd4a4a; stroke-width: 4; }
+.colorir-seeds { fill: var(--text-strong); }
+.colorir-detail { fill: none; stroke: var(--text-strong); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.5; }
+.colorir-nose { fill: var(--text-strong); }
+.colorir-number-labels text { fill: var(--text-strong); font: 700 14px var(--font-sans); paint-order: stroke; stroke: var(--bg-card); stroke-width: 4px; text-anchor: middle; dominant-baseline: middle; transition: opacity var(--transition); }
+.colorir-number-labels .is-hidden { opacity: 0; }
+.colorir-panel { display: grid; gap: .7rem; }
+.colorir-instruction { color: var(--text-muted); font-size: .84rem; text-align: center; min-height: 1.5em; }
+.colorir-instruction strong { color: var(--text-strong); }
+.colorir-palette { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; }
+.colorir-swatch { align-items: center; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text); cursor: pointer; display: flex; gap: .45rem; padding: .38rem .58rem .38rem .38rem; font: .72rem var(--font-sans); }
+.colorir-swatch b { align-items: center; background: var(--swatch); border-radius: 50%; color: #fff; display: inline-flex; height: 1.6rem; justify-content: center; width: 1.6rem; }
+.colorir-swatch:hover, .colorir-swatch.is-selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); color: var(--text-strong); }
+@keyframes colorir-shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+[data-theme="high-contrast"] .colorir-piece.is-target { stroke: #F5C842; }
 
 .two048-wrap {
   width: min(100%, 520px);
@@ -1278,6 +1327,18 @@ body.drawer-open { overflow: hidden; }
   border: 1px solid var(--border);
   color: var(--text-strong);
 }
+
+.mem-face--front svg {
+  width: 44px;
+  height: 44px;
+  fill: var(--text-strong);
+  stroke: var(--text-strong);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.7;
+}
+
+.mem-face--front .mem-art-line { fill: none; }
 
 .mem-card--matched .mem-face--front {
   background: rgba(187,173,160,0.1);

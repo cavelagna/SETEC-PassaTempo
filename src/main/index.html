@@ -290,8 +290,9 @@
             <article class="game-card game-card--soon" data-tags="xadrez classicos estrategia rei">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M9 4h6M12 2v5M9 8h6l-1 5 3 5H7l3-5zM6 21h12M8 18h8v3H8z"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Xadrez</h3><span class="card-meta">Dificuldade: Difícil</span></div></div><p class="card-desc">Planeje cada lance no clássico jogo de estratégia para duas pessoas.</p><span class="card-soon-badge">Em breve</span>
             </article>
-            <article class="game-card game-card--soon" data-tags="paciencia classicos cartas solitario">
+            <article class="game-card" data-game="solitaire" data-tags="paciencia classicos cartas solitario">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="4" width="11" height="15" rx="1.5"/><rect x="9" y="7" width="11" height="13" rx="1.5"/><path d="m14.5 11 2 2 2-2M16.5 10v5"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Paciência</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Organize as cartas em sequência em uma pausa tranquila para pensar.</p><span class="card-soon-badge">Em breve</span>
+              <p class="card-desc">Organize as cartas em sequência, alternando cores e completando os quatro naipes.</p><button class="card-btn" data-game="solitaire" aria-label="Jogar Paciência">Jogar</button>
             </article>
 
           </div>
@@ -318,7 +319,7 @@
           <div class="cards-grid">
             <article class="game-card" data-game="colorir" data-tags="colorir desenho infantil criatividade cores arte">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="m14 4 6 6M4 20l1.5-5.5L16.5 3.5a2.1 2.1 0 0 1 3 3L8.5 18.5zM13 7l4 4"/><path d="M4 20h16"/></svg><div class="card-info"><span class="card-category">Criatividade</span><h3 class="card-title">Colorir</h3><span class="card-meta">Dificuldade: Fácil</span></div></div>
-              <p class="card-desc">Escolha uma ilustração e experimente cores em uma atividade tranquila para todas as idades.</p><button class="card-btn" data-game="colorir" aria-label="Jogar Colorir">Jogar</button>
+              <p class="card-desc">Pinte ilustrações originais por números: cada cor revela as áreas correspondentes no desenho.</p><button class="card-btn" data-game="colorir" aria-label="Jogar Colorir">Jogar</button>
             </article>
             <article class="game-card game-card--soon" data-tags="block puzzle blocos logica estrategia encaixe">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Block Puzzle</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
@@ -382,6 +383,7 @@
   <script src="games/sudoku.js"></script>
   <script src="games/2048.js"></script>
   <script src="games/colorir.js"></script>
+  <script src="games/paciencia.js"></script>
 
   <!-- Orquestrador principal -->
   <script src="script.js"></script>

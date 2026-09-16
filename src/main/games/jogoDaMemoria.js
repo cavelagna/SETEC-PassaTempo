@@ -3,16 +3,16 @@
 // Jogo da Memória — módulo isolado
 const Memory = (() => {
 
-  // Pares de símbolos com nome acessível para aria-label
+  // Pares de ilustrações vetoriais próprias; não dependem de emojis ou fontes externas.
   const PAIRS = [
-    { sym: '♦', name: 'Losango'    },
-    { sym: '♣', name: 'Trevo'      },
-    { sym: '♠', name: 'Espada'     },
-    { sym: '♥', name: 'Coração'    },
-    { sym: '★', name: 'Estrela'    },
-    { sym: '◆', name: 'Diamante'   },
-    { sym: '▲', name: 'Triângulo'  },
-    { sym: '●', name: 'Círculo'    },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M14 38c7-17 17-23 36-21-3 18-16 29-36 21Z"/><path d="M15 49c13-9 24-19 34-34" class="mem-art-line"/><circle cx="48" cy="17" r="4"/></svg>', name: 'Folha' },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M11 43h42l-5-22H16Z"/><path d="M22 21c0-10 20-10 20 0" class="mem-art-line"/><path d="M18 31h28" class="mem-art-line"/></svg>', name: 'Mochila' },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M12 38 32 12l20 26-20 14Z"/><path d="m12 38 40 0M32 12v40" class="mem-art-line"/><path d="m18 32 28 0" class="mem-art-line"/></svg>', name: 'Pipa' },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M13 35c5-16 17-24 35-22-4 16-15 26-35 22Z"/><path d="M18 41c11-5 19-14 28-27" class="mem-art-line"/><path d="M16 17c7 2 13 5 18 10" class="mem-art-line"/></svg>', name: 'Pena' },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M19 18h26l4 31H15Z"/><path d="M23 18V12h18v6M16 31h32" class="mem-art-line"/><circle cx="25" cy="40" r="2"/><circle cx="39" cy="40" r="2"/></svg>', name: 'Lanterna' },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M12 29c4-16 20-16 20 0 0-16 16-16 20 0-4 16-20 16-20 0 0 16-16 16-20 0Z"/><path d="M32 28v23" class="mem-art-line"/><circle cx="32" cy="23" r="3"/></svg>', name: 'Borboleta' },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M16 42c0-14 9-23 23-23 7 0 12 3 16 8-4 10-13 18-27 18Z"/><path d="M13 45h39" class="mem-art-line"/><circle cx="38" cy="27" r="2"/></svg>', name: 'Tartaruga' },
+    { sym: '<svg viewBox="0 0 64 64"><path d="M18 45V27l14-12 14 12v18Z"/><path d="M25 45V34h14v11M15 27h34" class="mem-art-line"/><path d="M32 9v6" class="mem-art-line"/></svg>', name: 'Casinha' }
   ];
 
   let cards, flipped, matched, lockBoard, moves, seconds;

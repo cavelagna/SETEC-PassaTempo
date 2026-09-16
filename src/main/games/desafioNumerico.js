@@ -1,7 +1,7 @@
 'use strict';
 
 const NumberChallenge = (() => {
-  const TOTAL = 5;
+  const TOTAL = 12;
   const OPERATORS = ['+', '-', '×', '÷'];
   let container, state, challenge;
 

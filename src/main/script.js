@@ -16,6 +16,7 @@ const GAMES = {
   snake:       { module: Snake,       title: 'Snake'         },
   two048:      { module: TwoThousandFortyEight, title: '2048' },
   colorir:     { module: Colorir,    title: 'Colorir' },
+  solitaire:   { module: Solitaire,  title: 'Paciência' },
 };
 
 // ── Referências DOM ───────────────────────────────────────
