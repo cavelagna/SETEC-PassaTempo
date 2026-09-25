@@ -18,6 +18,7 @@ const GAMES = {
   colorir:     { module: Colorir,    title: 'Colorir' },
   solitaire:   { module: Solitaire,  title: 'Paciência' },
   chess:       { module: Chess,      title: 'Xadrez' },
+  checkers:    { module: Checkers,   title: 'Damas' },
 };
 
 // Instruções curtas, separadas por jogo. O registro é local ao navegador e
@@ -38,6 +39,7 @@ const GAME_RULES = {
   colorir: ['Escolha uma cor e clique nas áreas numeradas.', 'A cor deve corresponder ao número indicado.', 'Complete todos os números para revelar o desenho.'],
   solitaire: ['Mova cartas entre a reserva, o descarte e as fundações.', 'Organize cada coluna em ordem decrescente e alternada.', 'Complete as quatro fundações, do Ás ao Rei.'],
   chess: ['Clique em uma peça e depois no destino.', 'Faça jogadas legais e não deixe seu rei em xeque.', 'Tente colocar o rei do adversário em xeque para vencê-lo.'],
+  checkers: ['As peças claras começam e se movem na diagonal para frente.', 'Clique na peça e depois na casa destacada para mover ou capturar.', 'Capturas são obrigatórias. Ao chegar ao outro lado, sua peça vira dama.'],
 };
 
 // ── Referências DOM ───────────────────────────────────────

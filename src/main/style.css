@@ -742,12 +742,23 @@ body.drawer-open { overflow: hidden; }
   cursor: pointer;
   font: 500 0.78rem var(--font-sans);
   white-space: nowrap;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .game-instructions-btn:hover { background: var(--brown-pastel); }
 
 .game-rules-dialog {
+  position: fixed;
+  inset: 0;
   width: min(92vw, 540px);
+  max-width: calc(100vw - 2rem);
   max-height: min(86vh, 680px);
+  margin: auto;
   padding: 0;
   overflow: auto;
   border: 1px solid var(--border);
@@ -902,6 +913,28 @@ body.drawer-open { overflow: hidden; }
   background: var(--brown-pastel);
   border-color: var(--brown-light);
 }
+
+/* ── Damas ───────────────────────────────────────────────── */
+.checkers-game { width: min(100%, 620px); margin: 0 auto; display: grid; gap: 1rem; }
+.checkers-header, .checkers-actions, .checkers-turn { display: flex; align-items: center; }
+.checkers-header { justify-content: space-between; gap: 1rem; }
+.checkers-header h3 { color: var(--text-strong); font: 700 clamp(1.6rem, 5vw, 2.2rem) var(--font-serif); }
+.checkers-turn { gap: .45rem; padding: .45rem .7rem; border: 1px solid var(--border); border-radius: 999px; color: var(--text-muted); font-size: .78rem; }
+.checkers-turn-dot { width: .7rem; height: .7rem; border-radius: 50%; border: 1px solid var(--surface-brown); }
+.checkers-turn-dot.light { background: #f1e6d4; }
+.checkers-turn-dot.dark { background: var(--surface-brown); }
+.checkers-board { width: min(100%, 560px); aspect-ratio: 1; display: grid; grid-template-columns: repeat(8, 1fr); overflow: hidden; border: 5px solid var(--surface-brown); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); background: var(--surface-brown); }
+.checkers-cell { position: relative; aspect-ratio: 1; min-width: 0; border: 0; padding: 12%; cursor: default; }
+.checkers-cell.is-light { background: #e8dcc9; }
+.checkers-cell.is-dark { background: #9a8168; }
+.checkers-cell.is-available { cursor: pointer; box-shadow: inset 0 0 0 4px color-mix(in srgb, var(--accent) 85%, white); }
+.checkers-cell.is-selected { box-shadow: inset 0 0 0 4px var(--accent); }
+.checkers-cell:disabled { opacity: 1; }
+.checkers-piece { display: grid; place-items: center; width: 100%; height: 100%; border-radius: 50%; border: clamp(2px, .4vw, 4px) solid currentColor; color: #f3e6d2; background: var(--surface-brown); box-shadow: 0 2px 3px rgba(0,0,0,.22); font: 700 clamp(.5rem, 1.5vw, .8rem) var(--font-serif); }
+.checkers-piece.light { color: var(--surface-brown); background: #f3e6d2; }
+.checkers-piece.is-king { box-shadow: 0 0 0 2px var(--accent), 0 2px 3px rgba(0,0,0,.22); }
+.checkers-message { min-height: 1.5em; padding: .7rem .9rem; border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--brown-pastel) 18%, transparent); color: var(--text); font-size: .84rem; }
+.checkers-actions { justify-content: center; flex-wrap: wrap; gap: .65rem; }
 
 /* ── Paciência ──────────────────────────────────────────── */
 .sol-game { width: min(100%, 900px); margin-inline: auto; display: grid; gap: 1rem; }

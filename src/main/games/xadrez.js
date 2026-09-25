@@ -6,12 +6,13 @@ const Chess = (() => {
   const PIECES = { p: '♟', n: '♞', b: '♝', r: '♜', q: '♛', k: '♚' };
   const NAMES = { p: 'peão', n: 'cavalo', b: 'bispo', r: 'torre', q: 'dama', k: 'rei' };
   const FILES = 'abcdefgh';
-  let container, board, turn, selected, legal, history, gameOver;
+  let container, board, turn, selected, legal, history, gameOver, castlingRights;
   const key = (r, f) => r + ',' + f;
   const inside = (r, f) => r >= 0 && r < 8 && f >= 0 && f < 8;
   const clone = value => JSON.parse(JSON.stringify(value));
   const name = piece => NAMES[piece.type];
 
+  function opponent(color) { return color === 'white' ? 'black' : 'white'; }
   function initialBoard() {
     const rows = [];
     for (let r = 0; r < 8; r++) rows.push(Array(8).fill(null));
@@ -29,11 +30,36 @@ const Chess = (() => {
     if (directions) for (const [dr, df] of directions) { let nr = r + dr, nf = f + df; while (inside(nr, nf)) { add(nr, nf); if (board[nr][nf]) break; nr += dr; nf += df; } }
     if (piece.type === 'n') [[2, 1], [2, -1], [-2, 1], [-2, -1], [1, 2], [1, -2], [-1, 2], [-1, -2]].forEach(([dr, df]) => add(r + dr, f + df));
     if (piece.type === 'p') { const dir = piece.color === 'white' ? -1 : 1, start = piece.color === 'white' ? 6 : 1; add(r + dir, f); if (r === start && !board[r + dir * 2][f]) add(r + dir * 2, f); if (inside(r + dir, f) && board[r + dir][f]?.type === 'p' && board[r + dir][f].color !== piece.color) add(r + dir, f, 'q'); }
+    if (piece.type === 'k') {
+      const homeRow = piece.color === 'white' ? 7 : 0;
+      const right = piece.color === 'white' ? 'K' : 'k';
+      if (r === homeRow && f === 4 && castlingRights?.[right] && !board[r][5]?.type && !board[r][6]?.type && board[r][7]?.type === 'r' && board[r][7].color === piece.color) moves.push({ r, f: 6, castle: 'king' });
+      if (r === homeRow && f === 4 && castlingRights?.[right.toLowerCase()] && !board[r][3]?.type && !board[r][2]?.type && !board[r][1]?.type && board[r][0]?.type === 'r' && board[r][0].color === piece.color) moves.push({ r, f: 2, castle: 'queen' });
+    }
     return moves;
   }
   function king(r, f, color) { return board[r]?.[f]?.type === 'k' && board[r][f].color === color; }
   function attacked(r, f, color) {
-    return pseudoMoves(r, f).some(move => { const p = board[r][f], target = board[move.r]?.[move.f]; board[r][f] = null; board[move.r][move.f] = { type: 'k', color }; const danger = pseudoMoves(move.r, move.f).some(m => board[m.r]?.[m.f]?.type === 'k' && board[m.r][m.f].color === color); board[move.r][move.f] = target; board[r][f] = p; return danger; });
+    const enemy = opponent(color);
+    const knight = [[1,2],[1,-2],[-1,2],[-1,-2],[2,1],[2,-1],[-2,1],[-2,-1]];
+    if (knight.some(([dr, df]) => board[r + dr]?.[f + df]?.type === 'n' && board[r + dr][f + df].color === enemy)) return true;
+    for (let dr = -1; dr <= 1; dr++) for (let df = -1; df <= 1; df++) {
+      if (!dr && !df) continue;
+      let nr = r + dr, nf = f + df;
+      while (inside(nr, nf)) {
+        const piece = board[nr][nf];
+        if (piece) { if (piece.color === enemy && (piece.type === 'q' || piece.type === 'k')) return true; break; }
+        nr += dr; nf += df;
+      }
+    }
+    for (let step = -1; step <= 1; step += 2) {
+      let nr = r + step;
+      while (inside(nr, f)) { const piece = board[nr][f]; if (piece) { if (piece.color === enemy && (piece.type === 'r' || piece.type === 'q')) return true; break; } nr += step; }
+      let nf = f + step;
+      while (inside(r, nf)) { const piece = board[r][nf]; if (piece) { if (piece.color === enemy && (piece.type === 'r' || piece.type === 'q')) return true; break; } nf += step; }
+    }
+    const pawnRow = color === 'white' ? r - 1 : r + 1;
+    return [f - 1, f + 1].some(nf => board[pawnRow]?.[nf]?.type === 'p' && board[pawnRow][nf].color === enemy);
   }
   function inCheck(color) { for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) if (king(r, f, color) && attacked(r, f, color)) return true; return false; }
   function generate(color) {
@@ -41,13 +67,14 @@ const Chess = (() => {
     for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) if (board[r][f]?.color === color) for (const move of pseudoMoves(r, f)) {
       const snapshot = clone(board);
       board[move.r][move.f] = move.promotion ? { type: move.promotion, color } : board[r][f]; board[r][f] = null;
-      if (!inCheck(color)) result.push({ from: { r, f }, ...move });
+      const castlingSafe = !move.castle || (!attacked(move.r, move.f, color) && !attacked(move.r, move.f === 6 ? 5 : 3, color));
+      if (castlingSafe && !inCheck(color)) result.push({ from: { r, f }, ...move });
       board = snapshot;
     }
     return result;
   }
   function legalMoves() { return generate(turn).filter(move => { const snapshot = clone(board); board[move.r][move.f] = move.promotion ? { type: move.promotion, color: turn } : board[move.from.r][move.from.f]; board[move.from.r][move.from.f] = null; const ok = !inCheck(turn === 'white' ? 'black' : 'white'); board = snapshot; return ok; }); }
-  function newGame() { board = initialBoard(); turn = 'white'; selected = null; legal = []; history = []; gameOver = false; }
+  function newGame() { board = initialBoard(); castlingRights = { K: true, Q: true, k: true, q: true }; turn = 'white'; selected = null; legal = []; history = []; gameOver = false; }
   function symbol(piece) { const chars = piece.color === 'white' ? { p: '♙', n: '♘', b: '♗', r: '♖', q: '♕', k: '♔' } : PIECES; return chars[piece.type]; }
   function render() {
     const targets = new Set(legal.map(m => key(m.r, m.f))); const checked = inCheck(turn) ? 'checked' : '';
@@ -56,7 +83,7 @@ const Chess = (() => {
   function click(event) {
     if (event.target.closest('.chess-new')) { newGame(); render(); return; }
     if (gameOver) return; const square = event.target.closest('[data-square]'); if (!square) return; const [r, f] = square.dataset.square.split(',').map(Number);
-    if (selected) { const move = legal.find(m => m.from.r === selected.r && m.from.f === selected.f && m.r === r && m.f === f); if (move) { const piece = board[r][f] = move.promotion ? { type: move.promotion, color: turn } : board[selected.r][selected.f]; board[selected.r][selected.f] = null; if (piece.type === 'k' && Math.abs(f - selected.f) === 2) { const rookF = f > selected.f ? 7 : 0, rookFrom = selected.f > f ? 3 : 5; board[r][rookF] = board[r][rookFrom]; board[r][rookFrom] = null; } history.push(squareName(selected.r, selected.f) + (move.promotion ? '=' + move.promotion.toUpperCase() : '') + '-' + squareName(r, f)); turn = turn === 'white' ? 'black' : 'white'; selected = null; legal = []; gameOver = !legalMoves().length; render(); return; } }
+    if (selected) { const move = legal.find(m => m.from.r === selected.r && m.from.f === selected.f && m.r === r && m.f === f); if (move) { const piece = board[r][f] = move.promotion ? { type: move.promotion, color: turn } : board[selected.r][selected.f]; board[selected.r][selected.f] = null; if (move.castle) { const rookF = move.castle === 'king' ? 7 : 0, rookTo = move.castle === 'king' ? 5 : 3; board[r][rookTo] = board[r][rookF]; board[r][rookF] = null; } if (piece.type === 'k') { castlingRights[turn === 'white' ? 'K' : 'k'] = false; castlingRights[turn === 'white' ? 'Q' : 'q'] = false; } if (piece.type === 'r' && selected.r === (turn === 'white' ? 7 : 0) && selected.f === 0) castlingRights[turn === 'white' ? 'Q' : 'q'] = false; if (piece.type === 'r' && selected.r === (turn === 'white' ? 7 : 0) && selected.f === 7) castlingRights[turn === 'white' ? 'K' : 'k'] = false; history.push(squareName(selected.r, selected.f) + (move.promotion ? '=' + move.promotion.toUpperCase() : '') + '-' + squareName(r, f)); turn = opponent(turn); selected = null; legal = []; gameOver = !legalMoves().length; render(); return; } }
     const piece = board[r][f];
     if (selected && selected.r === r && selected.f === f) { selected = null; legal = []; }
     else if (!piece || piece.color !== turn) { selected = null; legal = []; }
