@@ -4,6 +4,7 @@
 const Solitaire = (() => {
   const SUITS = [{ id: 'hearts', symbol: '♥', red: true }, { id: 'diamonds', symbol: '♦', red: true }, { id: 'clubs', symbol: '♣', red: false }, { id: 'spades', symbol: '♠', red: false }];
   const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  const RANK_LABELS = { A: 'Ás', J: 'Valete', Q: 'Dama', K: 'Rei' };
   let container, state;
   const value = card => RANKS.indexOf(card.rank) + 1;
   const shuffle = deck => { for (let i = deck.length - 1; i; i--) { const j = Math.floor(Math.random() * (i + 1)); [deck[i], deck[j]] = [deck[j], deck[i]]; } return deck; };
@@ -16,12 +17,14 @@ const Solitaire = (() => {
   function cardMarkup(card, selected, extra) {
     if (!card) return '<div class="sol-slot ' + (extra || '') + '"></div>';
     if (!card.faceUp) return '<button class="sol-card sol-card--back ' + (extra || '') + '" aria-label="Carta virada para baixo"></button>';
-    return '<button class="sol-card ' + (card.suit.red ? 'sol-card--red ' : '') + (selected ? ' is-selected ' : '') + (extra || '') + '" aria-label="' + card.rank + ' de ' + card.suit.id + '"><span>' + card.rank + '</span><b>' + card.suit.symbol + '</b><i>' + card.suit.symbol + '</i></button>';
+    const name = RANK_LABELS[card.rank] || card.rank;
+    return '<button class="sol-card ' + (card.suit.red ? 'sol-card--red ' : '') + (selected ? ' is-selected ' : '') + (extra || '') + '" aria-label="' + name + ' de ' + card.suit.id + '"><span>' + card.rank + '</span><b>' + card.suit.symbol + '</b><i>' + card.suit.symbol + '</i></button>';
   }
   function render() {
     const s = state.selected;
     const pile = (cards, index) => '<div class="sol-tableau-pile">' + cards.map((card, cardIndex) => '<div class="sol-tableau-card" style="top:' + (cardIndex * 25) + 'px;z-index:' + cardIndex + '" data-zone="tableau" data-pile="' + index + '" data-index="' + cardIndex + '">' + cardMarkup(card, s && s.zone === 'tableau' && s.pile === index && s.index === cardIndex) + '</div>').join('') + (cards.length ? '' : '<div class="sol-tableau-card sol-empty" data-zone="tableau" data-pile="' + index + '"></div>') + '</div>';
-    container.innerHTML = '<section class="sol-game"><div class="sol-header"><div><p class="game-eyebrow">Klondike</p><h3>Paciência</h3></div><button class="game-action-btn sol-new">Novo jogo</button></div><p class="sol-help" role="status">Monte os naipes em ordem crescente. Nas colunas, alterne cores em ordem decrescente.</p><div class="sol-top"><div class="sol-stock" data-zone="stock">' + cardMarkup(state.stock.length ? { faceUp: false } : null, false) + '</div><div class="sol-waste" data-zone="waste">' + cardMarkup(state.waste.at(-1), s && s.zone === 'waste') + '</div><div class="sol-spacer"></div><div class="sol-foundations">' + state.foundations.map((foundation, index) => '<div data-zone="foundation" data-pile="' + index + '">' + cardMarkup(foundation.at(-1), s && s.zone === 'foundation' && s.pile === index, 'sol-foundation') + '</div>').join('') + '</div></div><div class="sol-tableau">' + state.tableau.map(pile).join('') + '</div></section>';
+    const stockLayers = state.stock.length ? '<span class="sol-stack-layer sol-stack-layer--3"></span><span class="sol-stack-layer sol-stack-layer--2"></span>' : '';
+    container.innerHTML = '<section class="sol-game"><div class="sol-header"><div><p class="game-eyebrow">Klondike</p><h3>Paciência</h3></div><button class="game-action-btn sol-new">Novo jogo</button></div><p class="sol-help" role="status">Monte os naipes em ordem crescente. Nas colunas, alterne cores em ordem decrescente.</p><div class="sol-top"><div class="sol-stock" data-zone="stock" aria-label="Baralho com ' + state.stock.length + ' cartas">' + stockLayers + cardMarkup(state.stock.length ? { faceUp: false } : null, false) + '</div><div class="sol-waste" data-zone="waste">' + (state.waste.length ? '<span class="sol-stack-layer sol-stack-layer--2"></span>' : '') + cardMarkup(state.waste.at(-1), s && s.zone === 'waste') + '</div><div class="sol-spacer"></div><div class="sol-foundations">' + state.foundations.map((foundation, index) => '<div data-zone="foundation" data-pile="' + index + '">' + cardMarkup(foundation.at(-1), s && s.zone === 'foundation' && s.pile === index, 'sol-foundation') + '</div>').join('') + '</div></div><div class="sol-tableau">' + state.tableau.map(pile).join('') + '</div></section>';
   }
   function source(zone, pile, index) {
     if (zone === 'waste') return state.waste.length ? { zone, cards: [state.waste.at(-1)] } : null;

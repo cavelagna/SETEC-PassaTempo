@@ -17,6 +17,7 @@ const GAMES = {
   two048:      { module: TwoThousandFortyEight, title: '2048' },
   colorir:     { module: Colorir,    title: 'Colorir' },
   solitaire:   { module: Solitaire,  title: 'Paciência' },
+  chess:       { module: Chess,      title: 'Xadrez' },
 };
 
 // ── Referências DOM ───────────────────────────────────────

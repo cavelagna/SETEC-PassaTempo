@@ -111,7 +111,7 @@
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Clássicos</button>
-        <ul class="drawer-games"><li><a href="#categoria-classicos" data-game="snake">Snake</a></li><li><a href="#categoria-logica" data-game="minesweeper">Campo Minado</a></li><li><a href="#categoria-classicos" data-game="tictactoe">Jogo da Velha</a></li><li><a href="#categoria-classicos">Damas</a></li><li><a href="#categoria-classicos">Xadrez</a></li><li><a href="#categoria-classicos">Paciência</a></li></ul>
+        <ul class="drawer-games"><li><a href="#categoria-classicos" data-game="snake">Snake</a></li><li><a href="#categoria-logica" data-game="minesweeper">Campo Minado</a></li><li><a href="#categoria-classicos" data-game="tictactoe">Jogo da Velha</a></li><li><a href="#categoria-classicos">Damas</a></li><li><a href="#categoria-classicos" data-game="chess">Xadrez</a></li><li><a href="#categoria-classicos">Paciência</a></li></ul>
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Matemática</button>
@@ -287,8 +287,8 @@
             <article class="game-card game-card--soon" data-tags="damas classicos estrategia tabuleiro">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 4h16v16H4zM4 10h16M10 4v16"/><circle cx="7" cy="7" r="2"/><circle cx="17" cy="17" r="2"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Damas</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Capture as peças adversárias e atravesse o tabuleiro com estratégia.</p><span class="card-soon-badge">Em breve</span>
             </article>
-            <article class="game-card game-card--soon" data-tags="xadrez classicos estrategia rei">
-              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M9 4h6M12 2v5M9 8h6l-1 5 3 5H7l3-5zM6 21h12M8 18h8v3H8z"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Xadrez</h3><span class="card-meta">Dificuldade: Difícil</span></div></div><p class="card-desc">Planeje cada lance no clássico jogo de estratégia para duas pessoas.</p><span class="card-soon-badge">Em breve</span>
+            <article class="game-card" data-game="chess" data-tags="xadrez classicos estrategia rei tabuleiro">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M9 4h6M12 2v5M9 8h6l-1 5 3 5H7l3-5zM6 21h12M8 18h8v3H8z"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Xadrez</h3><span class="card-meta">Dificuldade: Difícil</span></div></div><p class="card-desc">Planeje cada lance no clássico jogo de estratégia para duas pessoas.</p><button class="card-btn" data-game="chess" aria-label="Jogar Xadrez">Jogar</button>
             </article>
             <article class="game-card" data-game="solitaire" data-tags="paciencia classicos cartas solitario">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="4" y="4" width="11" height="15" rx="1.5"/><rect x="9" y="7" width="11" height="13" rx="1.5"/><path d="m14.5 11 2 2 2-2M16.5 10v5"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Paciência</h3><span class="card-meta">Dificuldade: Médio</span></div></div><p class="card-desc">Organize as cartas em sequência em uma pausa tranquila para pensar.</p><span class="card-soon-badge">Em breve</span>
@@ -384,6 +384,7 @@
   <script src="games/2048.js"></script>
   <script src="games/colorir.js"></script>
   <script src="games/paciencia.js"></script>
+  <script src="games/xadrez.js"></script>
 
   <!-- Orquestrador principal -->
   <script src="script.js"></script>
