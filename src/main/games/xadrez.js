@@ -56,8 +56,12 @@ const Chess = (() => {
   function click(event) {
     if (event.target.closest('.chess-new')) { newGame(); render(); return; }
     if (gameOver) return; const square = event.target.closest('[data-square]'); if (!square) return; const [r, f] = square.dataset.square.split(',').map(Number);
-    if (selected) { const move = legal.find(m => m.from.r === selected.r && m.from.f === selected.f && m.r === r && m.f === f); if (move) { const piece = board[r][f] = move.promotion ? { type: move.promotion, color: turn } : board[selected.r][selected.f]; board[selected.r][selected.f] = null; if (piece.type === 'k' && Math.abs(f - selected.f) === 2) { const rookF = f > selected.f ? 7 : 0, rookFrom = selected.f > f ? 3 : 5; board[r][rookF] = board[r][rookFrom]; board[r][rookFrom] = null; } history.push(squareName(selected.r, selected.f) + (move.promotion ? '=' + move.promotion.toUpperCase() : '') + '-' + squareName(r, f)); turn = turn === 'white' ? 'black' : 'white'; selected = null; legal = legalMoves(); gameOver = !legal.length; render(); return; } }
-    const piece = board[r][f]; if (!piece || piece.color !== turn) { selected = null; legal = []; } else { selected = { r, f }; legal = legalMoves().filter(m => m.from.r === r && m.from.f === f); } render();
+    if (selected) { const move = legal.find(m => m.from.r === selected.r && m.from.f === selected.f && m.r === r && m.f === f); if (move) { const piece = board[r][f] = move.promotion ? { type: move.promotion, color: turn } : board[selected.r][selected.f]; board[selected.r][selected.f] = null; if (piece.type === 'k' && Math.abs(f - selected.f) === 2) { const rookF = f > selected.f ? 7 : 0, rookFrom = selected.f > f ? 3 : 5; board[r][rookF] = board[r][rookFrom]; board[r][rookFrom] = null; } history.push(squareName(selected.r, selected.f) + (move.promotion ? '=' + move.promotion.toUpperCase() : '') + '-' + squareName(r, f)); turn = turn === 'white' ? 'black' : 'white'; selected = null; legal = []; gameOver = !legalMoves().length; render(); return; } }
+    const piece = board[r][f];
+    if (selected && selected.r === r && selected.f === f) { selected = null; legal = []; }
+    else if (!piece || piece.color !== turn) { selected = null; legal = []; }
+    else { selected = { r, f }; legal = legalMoves().filter(m => m.from.r === r && m.from.f === f); }
+    render();
   }
   function mount(el) { container = el; newGame(); render(); container.addEventListener('click', click); }
   function unmount() { if (container) { container.removeEventListener('click', click); container.innerHTML = ''; } container = null; board = null; }

@@ -20,6 +20,26 @@ const GAMES = {
   chess:       { module: Chess,      title: 'Xadrez' },
 };
 
+// Instruções curtas, separadas por jogo. O registro é local ao navegador e
+// guarda apenas quais telas já foram vistas.
+const GAME_RULES = {
+  quickcalc: ['Resolva a conta e digite a resposta.', 'Cada acerto soma pontos. Erros também avançam a rodada.', 'Você tem 90 segundos para fazer o máximo possível.'],
+  timestable: ['Escolha a tabuada e responda às perguntas.', 'Digite o resultado ou selecione uma resposta.', 'Respostas corretas aumentam sua pontuação.'],
+  numberchallenge: ['Use os quatro números uma única vez.', 'Monte a expressão e alcance o objetivo.', 'Você tem 10 desafios; cada solução soma pontos.'],
+  crossword: ['Leia a pista e escolha a palavra correspondente.', 'Preencha as casas em sequência horizontal ou vertical.', 'Palavras corretas ficam fixadas na grade.'],
+  wordsearch: ['Procure as palavras listadas na grade.', 'A busca pode seguir em qualquer direção.', 'Marque uma palavra por vez;elas disappearão da lista.'],
+  hangman: ['Escolha uma letra para tentar completar a palavra.', 'Letras corretas revelam posições; letras erradas gastam uma tentativa.', 'Complete a palavra antes que as tentativas acabem.'],
+  minesweeper: ['Revele células sem descobrir uma mina.', 'Os números indicam quantas minas cercam cada célula.', 'Marque as minas com o botão direito.'],
+  sudoku: ['Preencha a grade com números de 1 a 9.', 'Cada linha, coluna e bloco deve ter todos os números uma vez.', 'A dificuldade aumenta conforme você avança.'],
+  memory: ['Vire duas cartas por vez.', 'Encontre pares de imagens iguais para mantê-los descobertos.', 'Termine o tabuleiro com o menor número de tentativas.'],
+  tictactoe: ['Escolha uma casa vazia em cada rodada.', 'Forme uma linha horizontal, vertical ou diagonal antes do adversário.', 'Cada jogador alterna uma jogada por vez.'],
+  snake: ['Clique em Iniciar e dirija a cobra.', 'Use as setas ou os controles na tela para mudar de direção.', 'Coma a comida e evite as bordas e o próprio corpo.'],
+  two048: ['Deslize o tabuleiro para cima, baixo ou para os lados.', 'Combine dois números iguais para criar o dobro.', 'Alcance a peça 2048 sem ficar sem jogadas.'],
+  colorir: ['Escolha uma cor e clique nas áreas numeradas.', 'A cor deve corresponder ao número indicado.', 'Complete todos os números para revelar o desenho.'],
+  solitaire: ['Mova cartas entre a reserva, o descarte e as fundações.', 'Organize cada coluna em ordem decrescente e alternada.', 'Complete as quatro fundações, do Ás ao Rei.'],
+  chess: ['Clique em uma peça e depois no destino.', 'Faça jogadas legais e não deixe seu rei em xeque.', 'Tente colocar o rei do adversário em xeque para vencê-lo.'],
+};
+
 // ── Referências DOM ───────────────────────────────────────
 const viewHome     = document.getElementById('view-home');
 const viewGame     = document.getElementById('view-game');
@@ -37,6 +57,19 @@ const topbarBrand   = document.querySelector('.topbar-brand');
 const notificationButton = document.getElementById('btn-notifications');
 const accessibilityTip = document.getElementById('a11y-tip');
 const accessibilityTipClose = document.getElementById('a11y-tip-close');
+const instructionsButton = document.getElementById('game-instructions-btn');
+const rulesDialog = document.getElementById('game-rules-dialog');
+const rulesTitle = document.getElementById('game-rules-title');
+const rulesSummary = document.getElementById('game-rules-summary');
+const rulesList = document.getElementById('game-rules-list');
+const rulesClose = document.getElementById('game-rules-close');
+const RULES_STORAGE_KEY = 'pt-game-rules-seen';
+let seenGameRules = new Set();
+
+try {
+  const saved = JSON.parse(localStorage.getItem(RULES_STORAGE_KEY) || '[]');
+  if (Array.isArray(saved)) seenGameRules = new Set(saved.filter(id => Object.hasOwn(GAME_RULES, id)));
+} catch (_) {}
 
 let currentGame = null;
 const OVERLAY_GAMES = new Set(['two048', 'crossword', 'wordsearch']);
@@ -146,11 +179,55 @@ function showGame(id) {
   gameArea.innerHTML = '';
   entry.module.mount(gameArea);
 
+  if (!seenGameRules.has(id)) showGameRules(id);
+
   requestAnimationFrame(() => {
     viewGame.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    gameArea.focus({ preventScroll: true });
+    if (rulesDialog.open) rulesDialog.querySelector('.game-rules-close').focus({ preventScroll: true });
+    else gameArea.focus({ preventScroll: true });
   });
 }
+
+function showGameRules(id) {
+  const entry = GAMES[id];
+  const rules = GAME_RULES[id];
+  if (!entry || !rules) return;
+
+  rulesTitle.textContent = `Instruções de ${entry.title}`;
+  rulesSummary.textContent = `Leia os passos principais antes de ${entry.title === 'Colorir' ? 'colorir o desenho' : 'começar'}.`;
+  rulesList.replaceChildren(...rules.map(text => {
+    const item = document.createElement('li');
+    item.textContent = text;
+    return item;
+  }));
+  if (typeof rulesDialog.showModal === 'function') rulesDialog.showModal();
+  else rulesDialog.setAttribute('open', '');
+  rulesClose.focus();
+}
+
+function markGameRulesSeen(id) {
+  if (seenGameRules.has(id)) return;
+  seenGameRules.add(id);
+  try {
+    localStorage.setItem(RULES_STORAGE_KEY, JSON.stringify([...seenGameRules]));
+  } catch (_) {}
+}
+
+instructionsButton.addEventListener('click', () => {
+  if (currentGame) showGameRules(currentGame);
+});
+rulesClose.addEventListener('click', () => {
+  if (currentGame) markGameRulesSeen(currentGame);
+  rulesDialog.close();
+  gameArea.focus({ preventScroll: true });
+});
+rulesDialog.addEventListener('cancel', event => {
+  event.preventDefault();
+  rulesClose.click();
+});
+rulesDialog.addEventListener('click', event => {
+  if (event.target === rulesDialog) rulesClose.click();
+});
 
 // ── Botões "Jogar" nos cards ──────────────────────────────
 document.querySelectorAll('.card-btn').forEach(btn => {

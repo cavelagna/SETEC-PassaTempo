@@ -731,6 +731,45 @@ body.drawer-open { overflow: hidden; }
   line-height: 1.2;
 }
 
+.game-instructions-btn {
+  min-height: 44px;
+  margin-left: auto;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--surface-brown);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brown-pastel) 28%, var(--bg-card));
+  color: var(--text-strong);
+  cursor: pointer;
+  font: 500 0.78rem var(--font-sans);
+  white-space: nowrap;
+}
+.game-instructions-btn:hover { background: var(--brown-pastel); }
+
+.game-rules-dialog {
+  width: min(92vw, 540px);
+  max-height: min(86vh, 680px);
+  padding: 0;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+}
+.game-rules-dialog::backdrop { background: rgba(45, 36, 29, 0.68); backdrop-filter: blur(2px); }
+.game-rules-card { padding: clamp(1.4rem, 4vw, 2.25rem); }
+.game-rules-eyebrow { color: var(--text-muted); font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+.game-rules-card h2 { margin-top: .25rem; color: var(--text-strong); font: 700 clamp(1.4rem, 4vw, 1.9rem) var(--font-serif); }
+.game-rules-summary { margin-top: .65rem; color: var(--text-muted); }
+.game-rules-list { margin: 1.15rem 0 1.25rem; padding-left: 1.35rem; display: grid; gap: .65rem; }
+.game-rules-list li { padding-left: .25rem; }
+.game-rules-list li::marker { color: var(--surface-brown); font-weight: 700; }
+.game-rules-note { margin-bottom: 1.1rem; padding: .85rem 1rem; border-left: 3px solid var(--accent); background: color-mix(in srgb, var(--brown-pastel) 18%, transparent); display: grid; gap: .15rem; }
+.game-rules-note strong { color: var(--text-strong); font-size: .86rem; }
+.game-rules-note span { color: var(--text-muted); font-size: .78rem; }
+.game-rules-close { width: 100%; background: var(--surface-brown); border-color: var(--surface-brown); color: var(--on-brown); }
+.game-rules-close:hover { background: var(--accent); }
+
 #game-area {
   position: relative;
   display: flex;
@@ -883,8 +922,9 @@ body.drawer-open { overflow: hidden; }
 .sol-card--red { color: #b44f4b; }
 .sol-card--back { border-color: var(--surface-brown); background: repeating-linear-gradient(135deg, var(--surface-brown), var(--surface-brown) 7px, var(--accent) 7px, var(--accent) 9px); }
 .sol-slot, .sol-empty { border: 1px dashed var(--border); background: color-mix(in srgb, var(--surface-brown) 8%, transparent); }
-.sol-foundations > div[data-zone="foundation"] { display: grid; place-items: center; overflow: hidden; border: 1px dashed color-mix(in srgb, var(--surface-brown) 55%, transparent); border-radius: var(--radius-sm); background: color-mix(in srgb, var(--surface-brown) 17%, var(--bg-card)); }
-.sol-foundations .sol-foundation { width: 100%; height: 100%; border: 0; background: repeating-linear-gradient(135deg, var(--surface-brown), var(--surface-brown) 7px, var(--accent) 7px, var(--accent) 9px); }
+.sol-foundations > .sol-foundation-slot { display: grid; place-items: center; overflow: hidden; border: 0; border-radius: var(--radius-sm); background: var(--brown-pastel); background-image: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,.08) 8px, rgba(255,255,255,.08) 9px); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--surface-brown) 35%, transparent); }
+.sol-foundation-slot .sol-foundation-symbol { color: rgba(247,244,236,.72); font: 400 2.1rem var(--font-sans); text-shadow: 0 1px 2px rgba(45,34,27,.35); }
+.sol-foundation-slot .sol-card { position: relative; z-index: 1; }
 .sol-card.is-selected { outline: 3px solid var(--accent); outline-offset: 2px; }
 .sol-tableau { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .65rem; align-items: start; }
 .sol-tableau-pile { position: relative; min-height: 300px; }

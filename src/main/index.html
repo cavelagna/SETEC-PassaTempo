@@ -353,12 +353,27 @@
           Clique aqui para voltar para o início
         </button>
         <h2 class="game-running-title" id="game-running-title"></h2>
+        <button class="game-instructions-btn" id="game-instructions-btn" type="button">Ver instruções do jogo</button>
       </div>
       <div id="game-area" tabindex="-1" aria-label="Área do jogo em execução"></div>
     </div>
     <!-- ════ /VIEW: GAME ════ -->
 
   </main>
+
+  <dialog class="game-rules-dialog" id="game-rules-dialog" aria-labelledby="game-rules-title" aria-describedby="game-rules-summary">
+    <div class="game-rules-card">
+      <p class="game-rules-eyebrow">Como jogar</p>
+      <h2 id="game-rules-title"></h2>
+      <p id="game-rules-summary" class="game-rules-summary"></p>
+      <ol id="game-rules-list" class="game-rules-list"></ol>
+      <div class="game-rules-note">
+        <strong>A partida continuará normalmente</strong>
+        <span>Fechar estas instruções não reinicia o jogo.</span>
+      </div>
+      <button class="game-action-btn game-rules-close" id="game-rules-close" type="button">Entendi, jogar</button>
+    </div>
+  </dialog>
   <!-- ─── /Conteúdo principal ─────────────────────────────── -->
 
   <!-- ─── Rodapé ─────────────────────────────────────────── -->
