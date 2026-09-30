@@ -332,9 +332,12 @@ const Checkers = (() => {
 
     const capturedCount = step.path.filter(hop => hop.jump).length;
 
-    // Captura múltipla: se a MESMA peça ainda pode saltar, o turno continua
-    // com ela — o adversário só joga quando a sequência termina.
-    const chained = stepsFor(row, col).filter(option => option.capture);
+    // Captura múltipla: a sequência SÓ continua se a peça acabou de COMER.
+    // Se o lance foi um movimento simples (nada capturado), o turno passa,
+    // mesmo que a peça tenha chegado perto de uma peça adversária.
+    const chained = capturedCount > 0
+      ? stepsFor(row, col).filter(option => option.capture)
+      : [];
     if (chained.length && !evaluateBoard()) {
       // Captura múltipla obrigatória: só a mesma peça pode seguir saltando.
       selected = row * SIZE + col;
