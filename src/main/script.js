@@ -15,10 +15,12 @@ const GAMES = {
   tictactoe:   { module: TicTacToe,  title: 'Jogo da Velha' },
   snake:       { module: Snake,       title: 'Snake'         },
   two048:      { module: TwoThousandFortyEight, title: '2048' },
+  blockpuzzle: { module: BlockPuzzle, title: 'Tetris' },
   colorir:     { module: Colorir,    title: 'Colorir' },
   solitaire:   { module: Solitaire,  title: 'Paciência' },
   chess:       { module: Chess,      title: 'Xadrez' },
   checkers:    { module: Checkers,   title: 'Damas' },
+  quiz:        { module: Quiz,       title: 'Quiz' },
 };
 
 // Instruções curtas, separadas por jogo. O registro é local ao navegador e
@@ -38,8 +40,10 @@ const GAME_RULES = {
   two048: ['Deslize o tabuleiro para cima, baixo ou para os lados.', 'Combine dois números iguais para criar o dobro.', 'Alcance a peça 2048 sem ficar sem jogadas.'],
   colorir: ['Escolha uma cor e clique nas áreas numeradas.', 'A cor deve corresponder ao número indicado.', 'Complete todos os números para revelar o desenho.'],
   solitaire: ['Mova cartas entre a reserva, o descarte e as fundações.', 'Organize cada coluna em ordem decrescente e alternada.', 'Complete as quatro fundações, do Ás ao Rei.'],
-  chess: ['Clique em uma peça e depois no destino.', 'Faça jogadas legais e não deixe seu rei em xeque.', 'Tente colocar o rei do adversário em xeque para vencê-lo.'],
-  checkers: ['As peças claras começam e se movem na diagonal para frente.', 'Clique na peça e depois na casa destacada para mover ou capturar.', 'Capturas são obrigatórias. Ao chegar ao outro lado, sua peça vira dama.'],
+  chess: ['Clique na peça branca e depois na casa de destino (as casas legais aparecem destacadas).', 'O caminho inteiro que a peça pode percorrer é realceado; a casa com anel vermelho é onde a peça adversária é capturada.', 'Peões andam uma casa para frente e comem na diagonal. Cavalo anda em L. Bispo anda na diagonal. Torre anda em linha. Dama nas duas. Rei em qualquer direção.', 'A peça nunca atravessa outra peça e nunca anda para trás.', 'Promoção, castling (troca de rei e torre) e en passant também valem. Use Desfazer para corrigir um lance.'],
+  checkers: ['As peças claras começam e se movem na diagonal para frente, uma casa por vez.', 'Clique na peça e depois na casa destacada. As casas com anel vermelho são capturas.', 'Capturar é opcional: se houver peça adversária, você pode comê-la ou escolher outro lance livre.', 'Para capturar, salte sobre uma peça adversária e caia na casa vazia logo depois.', 'É possível capturar várias peças no mesmo lance, sempre com a mesma peça.', 'Ao chegar na fileira do adversário, sua peça é promovida a dama e passa a andar para trás.'],
+  blockpuzzle: ['As peças caem automaticamente do alto da grade.', 'Use as setas ← e → para mover e ↓ para descer mais rápido.', 'Gire com ↑ ou com a tecla R para encaixar melhor a peça; use C para guardar uma peça.', 'Pressione Espaço ou o botão Pausar para interromper a partida.', 'Complete linhas inteiras para somar pontos; ao completar quatro de uma vez, você ganha bônus.', 'A partida acaba quando uma peça nova não couber na grade.'],
+  quiz: ['Escolha o nível: Fácil (15 perguntas), Médio (25) ou Difícil (35).', 'As perguntas são sorteadas e a ordem das alternativas muda a cada partida.', 'Leia a pergunta e clique em uma alternativa antes que o tempo termine.', 'Cada acerto soma pontos; resposta errada ou tempo esgotado contam como erro.'],
 };
 
 // ── Referências DOM ───────────────────────────────────────
@@ -74,7 +78,7 @@ try {
 } catch (_) {}
 
 let currentGame = null;
-const OVERLAY_GAMES = new Set(['two048', 'crossword', 'wordsearch']);
+const OVERLAY_GAMES = new Set(['two048', 'crossword', 'wordsearch', 'quiz']);
 
 let notificationsEnabled = true;
 try { notificationsEnabled = localStorage.getItem('pt-a11y-notifications') !== 'false'; } catch (_) {}
@@ -113,11 +117,12 @@ window.setInterval(showAccessibilityTip, 5 * 60 * 1000);
 function showGameResult(result) {
   if (!gameArea || !OVERLAY_GAMES.has(currentGame) || gameArea.querySelector('.game-result-overlay')) return;
   const won = result === 'win';
+  const draw = result === 'draw';
   const overlay = document.createElement('div');
-  overlay.className = `game-result-overlay ${won ? 'is-win' : 'is-loss'}`;
+  overlay.className = `game-result-overlay ${won ? 'is-win' : draw ? 'is-draw' : 'is-loss'}`;
   overlay.setAttribute('role', 'status');
   overlay.setAttribute('aria-live', 'assertive');
-  overlay.innerHTML = `<strong>${won ? 'Você venceu!' : 'Você perdeu.'}</strong>`;
+  overlay.innerHTML = `<strong>${won ? 'Você venceu!' : draw ? 'Empate!' : 'Você perdeu.'}</strong>`;
   gameArea.appendChild(overlay);
 }
 
@@ -131,12 +136,13 @@ const resultObserver = new MutationObserver(mutations => {
   if (!viewGame || viewGame.hidden || !currentGame || !OVERLAY_GAMES.has(currentGame)) return;
   const text = mutations.map(mutation => mutation.target.textContent || '').join(' ');
   if (/você venceu|parabéns|venceu!/i.test(text)) showGameResult('win');
+  if (/empate/i.test(text)) showGameResult('draw');
   if (/você perdeu|fim de jogo/i.test(text)) showGameResult('loss');
 });
 resultObserver.observe(gameArea, { childList: true, subtree: true, characterData: true });
 
 gameArea.addEventListener('click', event => {
-  if (event.target.closest('.two048-restart, .crossword-restart, .word-search-restart')) clearGameResult();
+  if (event.target.closest('.two048-restart, .crossword-restart, .word-search-restart, .quiz-again')) clearGameResult();
 });
 
 window.addEventListener('passatempo:home', showHome);

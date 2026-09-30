@@ -103,7 +103,7 @@
     <nav class="drawer-nav" aria-label="Categorias e jogos">
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Lógica</button>
-        <ul class="drawer-games"><li><a href="#categoria-logica">Sudoku</a></li><li><a href="#categoria-logica" data-game="two048">2048</a></li><li><a href="#categoria-logica">Kakuro</a></li><li><a href="#categoria-logica">Nonograma</a></li></ul>
+        <ul class="drawer-games"><li><a href="#categoria-logica">Sudoku</a></li><li><a href="#categoria-logica" data-game="two048">2048</a></li></ul>
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Memória</button>
@@ -123,7 +123,7 @@
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Criatividade</button>
-        <ul class="drawer-games"><li><a href="#categoria-criatividade" data-game="colorir">Colorir</a></li><li><a href="#categoria-planejamento">Block Puzzle</a></li><li><a href="#categoria-planejamento">Breakout</a></li><li><a href="#categoria-planejamento">Quiz</a></li></ul>
+        <ul class="drawer-games"><li><a href="#categoria-criatividade" data-game="colorir">Colorir</a></li><li><a href="#categoria-criatividade" data-game="blockpuzzle">Tetris</a></li><li><a href="#categoria-planejamento">Breakout</a></li><li><a href="#categoria-criatividade" data-game="quiz">Quiz</a></li></ul>
       </div>
     </nav>
   </aside>
@@ -207,15 +207,6 @@
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">2048</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
               <p class="card-desc">Una números iguais e alcance a peça 2048 neste quebra-cabeça de estratégia.</p><button class="card-btn" data-game="two048" aria-label="Jogar 2048">Jogar</button>
             </article>
-            <article class="game-card game-card--soon" data-tags="kakuro logica numeros soma">
-              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 3h18v18H3zM3 10h18M10 3v18"/><path d="m4 9 5-5M11 20l9-9"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Kakuro</h3><span class="card-meta">Dificuldade: Difícil</span></div></div>
-              <p class="card-desc">Preencha as somas cruzadas usando raciocínio e combinações numéricas.</p><span class="card-soon-badge">Em breve</span>
-            </article>
-            <article class="game-card game-card--soon" data-tags="nonograma logica pixels desenho">
-              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 4h16v16H4zM9.3 4v16M14.7 4v16M4 9.3h16M4 14.7h16"/><path d="M5 5h4v4H5zM15 15h4v4h-4z" fill="currentColor" stroke="none"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Nonograma</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
-              <p class="card-desc">Decifre as pistas e revele desenhos escondidos em uma grade de pixels.</p><span class="card-soon-badge">Em breve</span>
-            </article>
-
           </div>
         </section>
 
@@ -321,17 +312,17 @@
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="m14 4 6 6M4 20l1.5-5.5L16.5 3.5a2.1 2.1 0 0 1 3 3L8.5 18.5zM13 7l4 4"/><path d="M4 20h16"/></svg><div class="card-info"><span class="card-category">Criatividade</span><h3 class="card-title">Colorir</h3><span class="card-meta">Dificuldade: Fácil</span></div></div>
               <p class="card-desc">Pinte ilustrações originais por números: cada cor revela as áreas correspondentes no desenho.</p><button class="card-btn" data-game="colorir" aria-label="Jogar Colorir">Jogar</button>
             </article>
-            <article class="game-card game-card--soon" data-tags="block puzzle blocos logica estrategia encaixe">
-              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Block Puzzle</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
-              <p class="card-desc">Encaixe peças na grade, complete linhas e organize cada movimento para fazer mais pontos.</p><span class="card-soon-badge">Em breve</span>
+            <article class="game-card" data-game="blockpuzzle" data-tags="tetris block puzzle blocos logica estrategia encaixe">
+              <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/></svg><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">Tetris</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <p class="card-desc">Encaixe peças na grade, complete linhas e organize cada movimento para fazer mais pontos.</p><button class="card-btn" data-game="blockpuzzle" aria-label="Jogar Tetris">Jogar</button>
             </article>
             <article class="game-card game-card--soon" data-tags="breakout arcade classico reflexo blocos">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M4 5h5v4H4zM10 5h5v4h-5zM16 5h4v4h-4zM7 11h5v4H7zM13 11h5v4h-5z"/><path d="M4 20h16M12 17v3"/></svg><div class="card-info"><span class="card-category">Clássicos</span><h3 class="card-title">Breakout</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
               <p class="card-desc">Rebata a bola e destrua os blocos sem deixar que ela escapar pela parte inferior.</p><span class="card-soon-badge">Em breve</span>
             </article>
-            <article class="game-card game-card--soon" data-tags="quiz perguntas conhecimentos infantil desafio">
+            <article class="game-card" data-game="quiz" data-tags="quiz perguntas conhecimentos infantil desafioOficina">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.6 2.6 0 1 1 4.2 2c-1.1.8-1.7 1.2-1.7 2.5M12 17h.01" stroke-linecap="round" stroke-width="1.8"/></svg><div class="card-info"><span class="card-category">Desafios</span><h3 class="card-title">Quiz</h3><span class="card-meta">Dificuldade: Variável</span></div></div>
-              <p class="card-desc">Responda perguntas de temas variados e descubra quanto você consegue acertar.</p><span class="card-soon-badge">Em breve</span>
+              <p class="card-desc">Responda perguntas de temas variados, do nível fácil ao difícil, e descubra quanto você consegue acertar.</p><button class="card-btn" data-game="quiz" aria-label="Jogar Quiz">Jogar</button>
             </article>
           </div>
         </section>
@@ -397,10 +388,12 @@
   <script src="games/cobra.js"></script>
   <script src="games/sudoku.js"></script>
   <script src="games/2048.js"></script>
+  <script src="games/blockPuzzle.js"></script>
   <script src="games/colorir.js"></script>
   <script src="games/paciencia.js"></script>
   <script src="games/xadrez.js"></script>
   <script src="games/damas.js"></script>
+  <script src="games/quiz.js"></script>
 
   <!-- Orquestrador principal -->
   <script src="script.js"></script>
