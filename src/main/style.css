@@ -870,6 +870,31 @@ body.drawer-open { overflow: hidden; }
   opacity: 0.55;
 }
 
+/* Faixa do curso exibida acima da área de todos os jogos */
+.game-dept-banner {
+  width: min(100%, 720px);
+  max-width: 100%;
+  margin: 0 auto .75rem;
+  padding: .6rem .9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-top: 2px solid var(--brown-pastel);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  color: var(--surface-brown);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: .78rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+[data-theme="high-contrast"] .game-dept-banner { color: var(--text-strong); border-top-color: var(--accent); }
+
 .game-result-overlay {
   position: absolute;
   inset: 0;
@@ -2095,3 +2120,372 @@ body.drawer-open { overflow: hidden; }
 .chess-move-empty { color: var(--text-muted); }
 .chess-history-empty { color: var(--text-muted); font-size: .78rem; text-align: left; }
 @media (max-width: 640px) { .chess-panels { grid-template-columns: minmax(0, 1fr); } .chess-header { flex-direction: column; align-items: flex-start; } .chess-actions { justify-content: flex-start; } }
+
+/* ══════════════════════════════════════════════════════════
+   Simon
+   ══════════════════════════════════════════════════════════ */
+.sim-game {
+  width: min(100%, 560px);
+  margin-inline: auto;
+  display: grid;
+  gap: 1rem;
+  justify-items: center;
+}
+
+.sim-hud {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .75rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-brown) 8%, var(--bg-card));
+}
+
+.sim-score { text-align: center; }
+.sim-score-label {
+  display: block;
+  color: var(--text-muted);
+  font-size: .6rem;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.sim-score strong {
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  line-height: 1.1;
+  color: var(--text-strong);
+}
+
+.sim-status {
+  min-height: 1.4em;
+  color: var(--text-muted);
+  font-size: .84rem;
+  text-align: center;
+}
+
+/* Barra de progresso da rodada */
+.sim-progress {
+  width: min(100%, 420px);
+  height: 6px;
+  margin: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-brown) 16%, var(--bg-card));
+  overflow: hidden;
+}
+.sim-progress-bar {
+  display: block;
+  height: 100%;
+  width: var(--sim-progress, 0%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--pad-color, var(--accent)), var(--brown-pastel));
+  transition: width var(--transition);
+}
+
+/* Palco circular com quatro setores, no formato do aparelho original:
+   disco redondo, aro escuro e miolo central. */
+.sim-pads {
+  position: relative;
+  width: min(100%, 380px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--surface-brown);
+  border: 6px solid var(--surface-brown);
+  box-shadow: var(--shadow-md), inset 0 0 0 2px color-mix(in srgb, var(--brown-pastel) 40%, transparent);
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.sim-hub {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--surface-brown);
+  border: 3px solid color-mix(in srgb, var(--brown-pastel) 45%, transparent);
+  box-shadow: inset 0 2px 6px rgb(0 0 0 / .35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Cada painel ocupa um quarto do disco: posicionado por ângulo, o que
+   reproduz fielmente o formato da foto. */
+.sim-pad {
+  position: absolute;
+  width: 50%;
+  height: 50%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: .1rem;
+  transition: filter var(--transition);
+}
+
+.sim-pad[data-pad="0"] { top: 0;    left: 0;  border-start-end-radius: 100% 0; }
+.sim-pad[data-pad="1"] { top: 0;    right: 0; border-end-start-radius: 100% 0; }
+.sim-pad[data-pad="2"] { bottom: 0; right: 0; border-start-start-radius: 100% 0; }
+.sim-pad[data-pad="3"] { bottom: 0; left: 0;  border-end-end-radius: 100% 0; }
+
+.sim-pad-shape {
+  width: 84%;
+  aspect-ratio: 1.28;
+  border-radius: 22%;
+  background: color-mix(in srgb, var(--pad-color) 62%, var(--surface-brown));
+  border: 1px solid color-mix(in srgb, var(--pad-glow) 40%, transparent);
+  box-shadow: inset 0 -3px 6px rgb(0 0 0 / .18);
+  transition: background var(--transition), box-shadow var(--transition), transform var(--transition), filter var(--transition);
+}
+
+.sim-pad-name {
+  position: absolute;
+  color: color-mix(in srgb, var(--pad-glow) 55%, var(--on-brown));
+  font-size: .58rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 2px rgb(0 0 0 / .3);
+  transition: color var(--transition);
+  pointer-events: none;
+}
+.sim-pad[data-pad="0"] .sim-pad-name { top: 12%; }
+.sim-pad[data-pad="1"] .sim-pad-name { top: 12%; }
+.sim-pad[data-pad="2"] .sim-pad-name { bottom: 12%; }
+.sim-pad[data-pad="3"] .sim-pad-name { bottom: 12%; }
+
+.sim-pad:hover:not([aria-disabled="true"]) .sim-pad-shape { filter: brightness(1.08); transform: scale(1.03); }
+
+.sim-pad.is-lit .sim-pad-shape {
+  background: var(--pad-glow);
+  border-color: var(--pad-glow);
+  transform: scale(1.02);
+  box-shadow: 0 0 24px color-mix(in srgb, var(--pad-color) 75%, transparent), inset 0 -3px 6px rgb(255 255 255 / .28);
+  filter: brightness(1.15);
+}
+.sim-pad.is-lit .sim-pad-name { color: var(--on-brown); }
+
+.sim-pad[aria-disabled="true"] { cursor: default; opacity: .75; }
+.sim-pad[aria-disabled="true"]:hover .sim-pad-shape { transform: none; }
+.sim-pad:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
+
+.sim-game.is-locked .sim-pad-name { opacity: .7; }
+
+.sim-actions { display: flex; justify-content: center; gap: .5rem; }
+.sim-start { background: var(--surface-brown); border-color: var(--surface-brown); color: var(--on-brown); font-weight: 600; }
+.sim-start:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); color: var(--on-brown); }
+.sim-start:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+.sim-hint { color: var(--text-muted); font-size: .76rem; text-align: center; }
+.sim-hint kbd {
+  display: inline-block;
+  min-width: 1.35rem;
+  padding: .05rem .3rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-card);
+  color: var(--text-strong);
+  font: .72rem var(--font-sans);
+  text-align: center;
+}
+
+[data-theme="high-contrast"] .sim-pad-shape {
+  background: transparent;
+  border-width: 3px;
+}
+[data-theme="high-contrast"] .sim-pad.is-lit .sim-pad-shape {
+  background: var(--pad-color);
+  box-shadow: none;
+}
+
+@media (max-width: 480px) {
+  .sim-hud { grid-template-columns: auto auto; justify-content: space-between; }
+  .sim-status { grid-column: 1 / -1; grid-row: 2; }
+  .sim-pads { width: min(100%, 300px); border-width: 4px; }
+  .sim-pad-name { font-size: .5rem; }
+}
+
+/* ══════════════════════════════════════════════════════════
+   Sequência Visual
+   ══════════════════════════════════════════════════════════ */
+.vs-game {
+  width: min(100%, 700px);
+  margin-inline: auto;
+  display: grid;
+  gap: .9rem;
+}
+
+.vs-hud {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .75rem;
+  padding: .7rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--surface-brown) 8%, var(--bg-card));
+}
+.vs-score-label {
+  display: block;
+  color: var(--text-muted);
+  font-size: .6rem;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+.vs-score strong { font-family: var(--font-serif); font-size: 1.4rem; line-height: 1.1; color: var(--text-strong); }
+.vs-score--lives strong { color: #c2534c; letter-spacing: .12em; font-size: 1.1rem; }
+.vs-status { min-height: 1.4em; color: var(--text-muted); font-size: .84rem; text-align: center; }
+
+.vs-eyebrow { text-align: center; }
+
+/* Palco: sequência exibida, uma figura por posição */
+.vs-stage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: .45rem;
+  margin: 0;
+  padding: .7rem;
+  list-style: none;
+  min-height: 96px;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+}
+.vs-stage-empty { color: var(--text-muted); font-size: .82rem; }
+
+.vs-step {
+  position: relative;
+  width: 62px;
+  height: 62px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border);
+  background: color-mix(in srgb, var(--surface-brown) 6%, transparent);
+  transition: background var(--transition), border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+.vs-step-index {
+  position: absolute;
+  top: -7px;
+  left: -5px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--surface-brown);
+  color: var(--on-brown);
+  font-size: .62rem;
+  font-weight: 600;
+}
+.vs-step-art svg { width: 34px; height: 34px; opacity: .22; transition: opacity var(--transition); }
+.vs-art-line { fill: none; stroke: var(--text-strong); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.vs-art-thin { fill: none; stroke: var(--text-strong); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.vs-art-dot { fill: var(--text-strong); stroke: none; }
+
+.vs-step.is-showing {
+  background: color-mix(in srgb, var(--accent) 26%, var(--bg-card));
+  border-color: var(--accent);
+  border-style: solid;
+  transform: scale(1.1);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+.vs-step.is-showing .vs-step-art svg { opacity: 1; }
+
+.vs-stage.is-hidden .vs-step {
+  background: hsl(var(--vs-hue) 42% 88%);
+  border-color: hsl(var(--vs-hue) 38% 62%);
+  border-style: solid;
+  box-shadow: inset 0 0 0 1px hsl(var(--vs-hue) 38% 62% / .35);
+}
+[data-theme="dark"] .vs-stage.is-hidden .vs-step,
+[data-theme="high-contrast"] .vs-stage.is-hidden .vs-step {
+  background: hsl(var(--vs-hue) 30% 26%);
+  border-color: hsl(var(--vs-hue) 45% 55%);
+}
+.vs-stage.is-hidden .vs-step-index { opacity: .9; }
+.vs-stage.is-hidden .vs-step-art { visibility: hidden; }
+
+/* Barra de tempo de pensar */
+.vs-think {
+  height: 6px;
+  margin: .45rem 0 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-brown) 16%, var(--bg-card));
+  overflow: hidden;
+}
+.vs-think-bar {
+  display: block;
+  height: 100%;
+  width: var(--vs-think, 100%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brown-pastel), var(--accent));
+  transition: width 250ms linear;
+}
+
+/* Banco de figuras para responder */
+.vs-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: .5rem;
+}
+.vs-option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: .25rem;
+  padding: .6rem .35rem .5rem;
+  min-height: 104px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--brown-pastel) 12%, var(--bg-card)), var(--bg-card) 60%);
+  color: var(--text);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color var(--transition), background-color var(--transition), transform var(--transition), opacity var(--transition), box-shadow var(--transition);
+}
+.vs-option::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 3px;
+  background: var(--brown-pastel);
+  opacity: .5;
+  transition: opacity var(--transition);
+}
+.vs-option-art svg { width: 42px; height: 42px; }
+.vs-option-name { color: var(--text-muted); font-size: .7rem; letter-spacing: .04em; }
+.vs-option:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+.vs-option:hover:not(:disabled)::after { opacity: 1; }
+.vs-option.is-used { opacity: .35; cursor: default; }
+.vs-option.is-hint { border-color: #c2534c; box-shadow: 0 0 0 2px #c2534c; }
+.vs-option.is-wrong { animation: vs-shake 300ms ease; border-color: #c2534c; background: color-mix(in srgb, #c2534c 16%, var(--bg-card)); }
+@keyframes vs-shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+
+.vs-actions { display: flex; justify-content: center; }
+.vs-start { background: var(--surface-brown); border-color: var(--surface-brown); color: var(--on-brown); font-weight: 600; }
+.vs-start:hover { background: var(--accent); border-color: var(--accent); color: var(--on-brown); }
+
+@media (max-width: 480px) {
+  .vs-hud { grid-template-columns: auto auto; justify-content: space-between; }
+  .vs-status { grid-column: 1 / -1; grid-row: 2; }
+  .vs-options { grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)); }
+  .vs-step { width: 54px; height: 54px; }
+  .vs-step-art svg { width: 30px; height: 30px; }
+  .vs-option { min-height: 90px; }
+  .vs-option-art svg { width: 34px; height: 34px; }
+}

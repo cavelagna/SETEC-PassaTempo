@@ -20,7 +20,9 @@ const GAMES = {
   solitaire:   { module: Solitaire,  title: 'Paciência' },
   chess:       { module: Chess,      title: 'Xadrez' },
   checkers:    { module: Checkers,   title: 'Damas' },
-  quiz:        { module: Quiz,       title: 'Quiz' },
+  quiz:        { module: Quiz,        title: 'Quiz' },
+  simon:       { module: Simon,        title: 'Simon' },
+  visualseq:   { module: VisualSequence, title: 'Sequência Visual' },
 };
 
 // Instruções curtas, separadas por jogo. O registro é local ao navegador e
@@ -44,6 +46,8 @@ const GAME_RULES = {
   checkers: ['As peças claras começam e se movem na diagonal para frente, uma casa por vez.', 'Clique na peça e depois na casa destacada. As casas com anel vermelho são capturas.', 'Capturar é opcional: se houver peça adversária, você pode comê-la ou escolher outro lance livre.', 'Para capturar, salte sobre uma peça adversária e caia na casa vazia logo depois.', 'É possível capturar várias peças no mesmo lance, sempre com a mesma peça.', 'Ao chegar na fileira do adversário, sua peça é promovida a dama e passa a andar para trás.'],
   blockpuzzle: ['As peças caem automaticamente do alto da grade.', 'Use as setas ← e → para mover e ↓ para descer mais rápido.', 'Gire com ↑ ou com a tecla R para encaixar melhor a peça; use C para guardar uma peça.', 'Pressione Espaço ou o botão Pausar para interromper a partida.', 'Complete linhas inteiras para somar pontos; ao completar quatro de uma vez, você ganha bônus.', 'A partida acaba quando uma peça nova não couber na grade.'],
   quiz: ['Escolha o nível: Fácil (15 perguntas), Médio (25) ou Difícil (35).', 'As perguntas são sorteadas e a ordem das alternativas muda a cada partida.', 'Leia a pergunta e clique em uma alternativa antes que o tempo termine.', 'Cada acerto soma pontos; resposta errada ou tempo esgotado contam como erro.'],
+  simon: ['Clique em “Iniciar jogo” para a sequência começar.', 'Observe e ouça os quatro painéis acendendo em ordem, cada um com seu próprio tom musical.', 'Repita a sequência usando o mouse, o toque ou as teclas 1, 2, 3 e 4.', 'Acompanhe a barra de progresso: a cada rodada a sequência cresce e o ritmo acelera um pouco.', 'Um único erro encerra a rodada; o recorde fica salvo no navegador.'],
+  visualseq: ['Clique em “Iniciar jogo” para começar.', 'Observe as figuras aparecendo em sequência e memorize a ordem.', 'Depois da demonstração as figuras se escondem e o cronômetro começa: você tem 5 segundos para responder na primeira fase, e mais 1 segundo a cada fase seguinte.', 'Não há espera: você pode pensar e clicar ao mesmo tempo, dentro do tempo mostrado na barra.', 'Se o cronômetro zerar antes de você completar a ordem, você perde uma vida.', 'Toque nas figuras embaralhadas seguindo exatamente a ordem vista.', 'Cada rodada acrescenta uma figura nova à sequência anterior, formando fases cada vez maiores.', 'Você tem 3 vidas; um erro custa uma vida e a sequência é mostrada de novo.', 'Quando as vidas acabarem, clique em “Iniciar jogo” para recomeçar.'],
 };
 
 // ── Referências DOM ───────────────────────────────────────

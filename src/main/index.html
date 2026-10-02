@@ -107,7 +107,7 @@
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Memória</button>
-        <ul class="drawer-games"><li><a href="#categoria-memoria" data-game="memory">Jogo da Memória</a></li><li><a href="#categoria-memoria">Sequência Visual</a></li><li><a href="#categoria-memoria">Simon</a></li></ul>
+        <ul class="drawer-games"><li><a href="#categoria-memoria" data-game="memory">Jogo da Memória</a></li><li><a href="#categoria-memoria" data-game="visualseq">Sequência Visual</a></li><li><a href="#categoria-memoria" data-game="simon">Simon</a></li></ul>
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Clássicos</button>
@@ -139,6 +139,9 @@
         <h1 class="site-title">PassaTempo</h1>
         <p class="site-subtitle">
           Coleção de jogos clássicos, jogue, pense, e simplesmente deixe o tempo passar...
+        </p>
+        <p class="site-subtitle">
+          <b>Feito por: Giovanni Cavelagna | 2° Des. Sistemas</b>
         </p>
       </header>
 
@@ -231,13 +234,13 @@
               <p class="card-desc">Encontre os pares virando duas cartas por vez. Treine a concentração e a memória visual.</p>
               <button class="card-btn" data-game="memory" aria-label="Jogar Jogo da Memória">Jogar</button>
             </article>
-            <article class="game-card game-card--soon" data-tags="sequencia visual memoria cores padrao">
+            <article class="game-card" data-game="visualseq" data-tags="sequencia visual memoria ordem figuras imagens padrao">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="6" cy="12" r="2"/><circle cx="12" cy="7" r="2"/><circle cx="18" cy="12" r="2"/><path d="M8 11 10 8M14 8l2 3"/></svg><div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Sequência Visual</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
-              <p class="card-desc">Observe o padrão, guarde a sequência e repita cada novo desafio.</p><span class="card-soon-badge">Em breve</span>
+              <p class="card-desc">Memorize a ordem em que as figuras aparecem e reponha a sequência tocando nelas.</p><button class="card-btn" data-game="visualseq" aria-label="Jogar Sequência Visual">Jogar</button>
             </article>
-            <article class="game-card game-card--soon" data-tags="simon memoria sequencia sons">
+            <article class="game-card" data-game="simon" data-tags="simon memoria sequencia sons cores luz">
               <div class="card-top"><svg class="card-icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="2"/></svg><div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Simon</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
-              <p class="card-desc">Acompanhe luzes e sons em sequências que ficam maiores a cada rodada.</p><span class="card-soon-badge">Em breve</span>
+              <p class="card-desc">Acompanhe luzes e sons em sequências que ficam maiores a cada rodada.</p><button class="card-btn" data-game="simon" aria-label="Jogar Simon">Jogar</button>
             </article>
 
           </div>
@@ -346,6 +349,7 @@
         <h2 class="game-running-title" id="game-running-title"></h2>
         <button class="game-instructions-btn" id="game-instructions-btn" type="button">Ver instruções do jogo</button>
       </div>
+      <p class="game-dept-banner">Desenvolvimento de Sistemas</p>
       <div id="game-area" tabindex="-1" aria-label="Área do jogo em execução"></div>
     </div>
     <!-- ════ /VIEW: GAME ════ -->
@@ -394,6 +398,8 @@
   <script src="games/xadrez.js"></script>
   <script src="games/damas.js?v=3"></script>
   <script src="games/quiz.js"></script>
+  <script src="games/simon.js"></script>
+  <script src="games/sequenciaVisual.js"></script>
 
   <!-- Orquestrador principal -->
   <script src="script.js"></script>
