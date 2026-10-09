@@ -16,8 +16,8 @@ const GAMES = {
   snake:       { module: Snake,       title: 'Snake'         },
   two048:      { module: TwoThousandFortyEight, title: '2048' },
   blockpuzzle: { module: BlockPuzzle, title: 'Tetris' },
-  colorir:     { module: Colorir,    title: 'Colorir' },
   solitaire:   { module: Solitaire,  title: 'Paciência' },
+  breakout:    { module: Breakout,    title: 'Breakout' },
   chess:       { module: Chess,      title: 'Xadrez' },
   checkers:    { module: Checkers,   title: 'Damas' },
   quiz:        { module: Quiz,        title: 'Quiz' },
@@ -40,11 +40,11 @@ const GAME_RULES = {
   tictactoe: ['Escolha uma casa vazia em cada rodada.', 'Forme uma linha horizontal, vertical ou diagonal antes do adversário.', 'Cada jogador alterna uma jogada por vez.'],
   snake: ['Clique em Iniciar e dirija a cobra.', 'Use as setas ou os controles na tela para mudar de direção.', 'Coma a comida e evite as bordas e o próprio corpo.'],
   two048: ['Deslize o tabuleiro para cima, baixo ou para os lados.', 'Combine dois números iguais para criar o dobro.', 'Alcance a peça 2048 sem ficar sem jogadas.'],
-  colorir: ['Escolha uma cor e clique nas áreas numeradas.', 'A cor deve corresponder ao número indicado.', 'Complete todos os números para revelar o desenho.'],
   solitaire: ['Mova cartas entre a reserva, o descarte e as fundações.', 'Organize cada coluna em ordem decrescente e alternada.', 'Complete as quatro fundações, do Ás ao Rei.'],
   chess: ['Clique na peça branca e depois na casa de destino (as casas legais aparecem destacadas).', 'O caminho inteiro que a peça pode percorrer é realceado; a casa com anel vermelho é onde a peça adversária é capturada.', 'Peões andam uma casa para frente e comem na diagonal. Cavalo anda em L. Bispo anda na diagonal. Torre anda em linha. Dama nas duas. Rei em qualquer direção.', 'A peça nunca atravessa outra peça e nunca anda para trás.', 'Promoção, castling (troca de rei e torre) e en passant também valem. Use Desfazer para corrigir um lance.'],
-  checkers: ['As peças claras começam e se movem na diagonal para frente, uma casa por vez.', 'Clique na peça e depois na casa destacada. As casas com anel vermelho são capturas.', 'Capturar é opcional: se houver peça adversária, você pode comê-la ou escolher outro lance livre.', 'Para capturar, salte sobre uma peça adversária e caia na casa vazia logo depois.', 'É possível capturar várias peças no mesmo lance, sempre com a mesma peça.', 'Ao chegar na fileira do adversário, sua peça é promovida a dama e passa a andar para trás.'],
+  checkers: ['As peças claras começam e se movem na diagonal para frente, uma casa por vez.', 'Clique na peça e depois na casa destacada. As casas com anel vermelho são capturas.', 'A captura é obrigatória: se houver captura possível, escolha uma peça marcada e salte sobre a adversária para a casa vazia depois dela.', 'É possível capturar várias peças no mesmo lance, sempre com a mesma peça; continue até não haver outro salto.', 'Ao chegar na fileira do adversário, sua peça é promovida a dama e passa a andar para trás.'],
   blockpuzzle: ['As peças caem automaticamente do alto da grade.', 'Use as setas ← e → para mover e ↓ para descer mais rápido.', 'Gire com ↑ ou com a tecla R para encaixar melhor a peça; use C para guardar uma peça.', 'Pressione Espaço ou o botão Pausar para interromper a partida.', 'Complete linhas inteiras para somar pontos; ao completar quatro de uma vez, você ganha bônus.', 'A partida acaba quando uma peça nova não couber na grade.'],
+  breakout: ['Mova a plataforma para rebater a bola e destruir todos os blocos.', 'Use as setas, A e D, o mouse ou os controles na tela para mover a plataforma.', 'A bola que cair pela parte inferior custa uma vida; a partida termina ao perder as três vidas.', 'Use Espaço ou Pausar para interromper a partida; Reiniciar começa uma nova rodada.'],
   quiz: ['Escolha o nível: Fácil (15 perguntas), Médio (25) ou Difícil (35).', 'As perguntas são sorteadas e a ordem das alternativas muda a cada partida.', 'Leia a pergunta e clique em uma alternativa antes que o tempo termine.', 'Cada acerto soma pontos; resposta errada ou tempo esgotado contam como erro.'],
   simon: ['Clique em “Iniciar jogo” para a sequência começar.', 'Observe e ouça os quatro painéis acendendo em ordem, cada um com seu próprio tom musical.', 'Repita a sequência usando o mouse, o toque ou as teclas 1, 2, 3 e 4.', 'Acompanhe a barra de progresso: a cada rodada a sequência cresce e o ritmo acelera um pouco.', 'Um único erro encerra a rodada; o recorde fica salvo no navegador.'],
   visualseq: ['Clique em “Iniciar jogo” para começar.', 'Observe as figuras aparecendo em sequência e memorize a ordem.', 'Depois da demonstração as figuras se escondem e o cronômetro começa: você tem 5 segundos para responder na primeira fase, e mais 1 segundo a cada fase seguinte.', 'Não há espera: você pode pensar e clicar ao mesmo tempo, dentro do tempo mostrado na barra.', 'Se o cronômetro zerar antes de você completar a ordem, você perde uma vida.', 'Toque nas figuras embaralhadas seguindo exatamente a ordem vista.', 'Cada rodada acrescenta uma figura nova à sequência anterior, formando fases cada vez maiores.', 'Você tem 3 vidas; um erro custa uma vida e a sequência é mostrada de novo.', 'Quando as vidas acabarem, clique em “Iniciar jogo” para recomeçar.'],
@@ -206,7 +206,7 @@ function showGameRules(id) {
   if (!entry || !rules) return;
 
   rulesTitle.textContent = `Instruções de ${entry.title}`;
-  rulesSummary.textContent = `Leia os passos principais antes de ${entry.title === 'Colorir' ? 'colorir o desenho' : 'começar'}.`;
+  rulesSummary.textContent = `Leia os passos principais antes de começar.`;
   rulesList.replaceChildren(...rules.map(text => {
     const item = document.createElement('li');
     item.textContent = text;

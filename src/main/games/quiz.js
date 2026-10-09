@@ -59,7 +59,7 @@ const Quiz = (() => {
     { q: 'Qual cidade brasileira é conhecida como a capital da moda?', a: ['São Paulo', 'Curitiba', 'Recife', 'Salvador'] },
     { q: 'Qual é o único mamífero capaz de voar ativamente?', a: ['Morcego', 'Voador-do-solo', 'Toupeira', 'Preguiça'] },
     { q: 'Quem foi a primeira pessoa a viajar ao espaço?', a: ['Yuri Gagarin', 'Neil Armstrong', 'Laika', 'Valentina Tereshkova'] },
-    { q: 'Qual é o menor estado brasileiro em área territorial?', a: ['Roraima', 'Tocantins', 'Sergipe', 'Alagoas'] },
+    { q: 'Qual é o menor estado brasileiro em área territorial?', a: ['Sergipe', 'Roraima', 'Tocantins', 'Alagoas'] },
     { q: 'Como se chama o estudo das estrelas e do universo?', a: ['Astronomia', 'Astrologia', 'Geometria', 'Biologia'] },
     { q: 'Qual é o principal componente do ar que respiramos?', a: ['Nitrogênio', 'Oxigênio', 'Gás carbônico', 'Vapor de água'] },
     { q: 'Em que cidade americana foi assinada a Declaração de Independência dos Estados Unidos?', a: ['Filadélfia', 'Nova York', 'Boston', 'Washington'] },
@@ -69,7 +69,7 @@ const Quiz = (() => {
     { q: 'Qual navegador foi criado pela empresa Google?', a: ['Chrome', 'Firefox', 'Safari', 'Edge'] },
     { q: 'Qual é a capital do estado do Maranhão?', a: ['São Luís', 'Teresina', 'Fortaleza', 'Belém'] },
     { q: 'Quem pintou o teto da Capela Sistina?', a: ['Michelangelo', 'Leonardo da Vinci', 'Rafael', 'Donatello'] },
-    { q: 'Qual é o maior animal terrestre da América do Sul?', a: ['Anaconda', 'Tatu-bola', 'Capivara', 'Lontra'] },
+    { q: 'Qual é o maior animal terrestre da América do Sul?', a: ['Anta', 'Capivara', 'Anaconda', 'Tatu-bola'] },
   ];
 
   // ── Nível difícil ─────────────────────────────────────────
@@ -79,7 +79,7 @@ const Quiz = (() => {
     { q: 'Qual é o menor país do mundo em área territorial?', a: ['Vaticano', 'Mônaco', 'San Marino', 'Liechtenstein'] },
     { q: 'Quantos fusos horários oficiais existem na Rússia?', a: ['11 fusos horários', '9 fusos horários', '7 fusos horários', '13 fusos horários'] },
     { q: 'Qual é o elemento químico mais abundante em todo o Universo?', a: ['Hidrogênio', 'Oxigênio', 'Carbono', 'Hélio'] },
-    { q: 'Qual físico recebeu o Prêmio Nobel de Física em 1911?', a: ['Wilhelm Röntgen', 'Henri Becquerel', 'Ernest Rutherford', 'Max Planck'] },
+    { q: 'Qual físico recebeu o Prêmio Nobel de Física em 1911?', a: ['Wilhelm Wien', 'Wilhelm Röntgen', 'Ernest Rutherford', 'Max Planck'] },
     { q: 'Qual é a unidade de potência no Sistema Internacional?', a: ['Watt', 'Joule', 'Pascal', 'Newton'] },
     { q: 'Que rio corta a cidade de Londres?', a: ['Rio Tâmisa', 'Rio Sena', 'Rio Tibre', 'Rio Danúbio'] },
     { q: 'Qual matemático grego é conhecido pelo teorema do triângulo retângulo?', a: ['Pitágoras', 'Euclides', 'Arquimedes', 'Fermat'] },
@@ -106,10 +106,10 @@ const Quiz = (() => {
     { q: 'Qual tag HTML define o título principal de uma página?', a: ['<h1>', '<title>', '<head>', '<p>'] },
     { q: 'Qual protocolo permite a uma página carregar recursos de outro domínio?', a: ['CORS', 'FTP', 'SMTP', 'DHCP'] },
     { q: 'Quem criou o sistema operacional Linux?', a: ['Linus Torvalds e a comunidade', 'Microsoft', 'Apple', 'Google'] },
-    { q: 'Qual é o menor primo de 5?', a: ['3', '2', '4', '7'] },
+    { q: 'Qual é o menor número primo maior que 2?', a: ['3', '2', '4', '7'] },
     { q: 'Em que país fica a estátua do Cristo Redentor?', a: ['Brasil', 'Portugal', 'Espanha', 'Argentina'] },
     { q: 'Qual oceano fica entre a África e a Austrália?', a: ['Oceano Índico', 'Oceano Atlântico', 'Oceano Pacífico', 'Oceano Ártico'] },
-    { q: 'Qual é o maior lago de água doce do mundo em superfície?', a: ['Lago Baikal', 'Lago Titicaca', 'Lago Michigan', 'Lago Superior'] },
+    { q: 'Qual é o maior lago de água doce do mundo em superfície?', a: ['Lago Superior', 'Lago Baikal', 'Lago Titicaca', 'Lago Michigan'] },
     { q: 'Qual é a principal causa do efeito estufa?', a: ['Os gases de efeito estufa', 'A chuva ácida', 'Os buracos na camada de ozônio', 'A maré alta'] },
     { q: 'Qual é a capital do Canadá?', a: ['Ottawa', 'Toronto', 'Vancouver', 'Montreal'] },
     { q: 'Qual instrumento mede a pressão atmosférica?', a: ['Barômetro', 'Termômetro', 'Higrômetro', 'Anemômetro'] },
@@ -140,6 +140,20 @@ const Quiz = (() => {
   let answered = false;
   let secondsLeft = TIME_PER_QUESTION;
   let timer = null;
+  let advanceTimer = null;
+
+  function clearAdvanceTimer() {
+    clearTimeout(advanceTimer);
+    advanceTimer = null;
+  }
+
+  function scheduleNext(delay) {
+    clearAdvanceTimer();
+    advanceTimer = setTimeout(() => {
+      advanceTimer = null;
+      next();
+    }, delay);
+  }
 
   // ── Sorteio ───────────────────────────────────────────────
   function shuffle(list) {
@@ -335,7 +349,7 @@ const Quiz = (() => {
       showFeedback('Resposta incorreta. A alternativa correta está destacada.', 'wrong');
     }
 
-    setTimeout(next, 1500);
+    scheduleNext(1500);
   }
 
   function timeUp() {
@@ -347,7 +361,7 @@ const Quiz = (() => {
     streak = 0;
     revealRight();
     showFeedback('Tempo esgotado! A alternativa correta está destacada.', 'wrong');
-    setTimeout(next, 1900);
+    scheduleNext(1900);
   }
 
   function skip() {
@@ -359,7 +373,7 @@ const Quiz = (() => {
     streak = 0;
     revealRight();
     showFeedback('Pergunta pulada.', 'wrong');
-    setTimeout(next, 1100);
+    scheduleNext(1100);
   }
 
   function next() {
@@ -371,6 +385,7 @@ const Quiz = (() => {
   function finish(quit) {
     clearInterval(timer);
     timer = null;
+    clearAdvanceTimer();
     renderResult(quit);
     if (!quit && questions.length) {
       const won = correct / questions.length >= 0.7;
@@ -387,6 +402,7 @@ const Quiz = (() => {
   function unmount() {
     clearInterval(timer);
     timer = null;
+    clearAdvanceTimer();
     if (container) container.innerHTML = '';
     container = null;
     questions = [];

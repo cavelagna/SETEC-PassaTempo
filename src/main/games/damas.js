@@ -162,6 +162,7 @@ const Checkers = (() => {
     if (!board[row] || !board[row][col] || board[row][col].player !== turn) return [];
     const steps = stepsFor(row, col);
     const captures = steps.filter(step => step.capture);
+    if (mustCapture) return captures;
     return captures.length ? captures : steps;
   }
 

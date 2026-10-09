@@ -429,14 +429,14 @@ const Chess = (() => {
         if (lastMove && (lastMove.from === i || lastMove.to === i)) classes.push('is-last');
 
         const description = sqName(i) +
-          (piece ? `: ${PIECE_NAME[piece.t]} ${piece.color === 'w' ? 'branco' : 'preto'}` : ': vazia') +
+          (piece ? `: ${PIECE_NAME[piece.t]} ${piece.c === 'w' ? 'branco' : 'preto'}` : ': vazia') +
           (move ? (move.captured || move.enPassant ? ', casa de captura' : ', destino legal') : '') +
           (path.has(i) ? ', casa do trajeto' : '');
 
         cells.push(
           '<button type="button" class="' + classes.join(' ') + '" data-square="' + i + '"' +
           ' aria-label="' + description + '"' +
-          (piece ? '><span class="chess-piece ' + piece.color + '" aria-hidden="true">' + GLYPH[piece.c][piece.t] + '</span></button>'
+          (piece ? '><span class="chess-piece ' + (piece.c === 'w' ? 'white' : 'black') + '" aria-hidden="true">' + GLYPH[piece.c][piece.t] + '</span></button>'
             : '></button>')
         );
       }
