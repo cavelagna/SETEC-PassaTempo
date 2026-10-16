@@ -169,6 +169,12 @@ const Quiz = (() => {
 
   // Todas as alternativas são embaralhadas JÁ COM a marcação correta,
   // senão a posição 0 seria tratada como acerto depois do embaralhamento.
+  // Alternativas podem conter texto com sintaxe de tags (ex.: "<h1>");
+  // sem escapar, o navegador as interpreta como HTML e a opção desaparece.
+  function escapeHtml(text) {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
   function shuffledOptions(question) {
     return shuffle(question.a.map((text, i) => ({ text, correct: i === 0 })));
   }
@@ -223,7 +229,7 @@ const Quiz = (() => {
           options.map((option, i) =>
             '<button class="game-action-btn quiz-option" type="button" data-option="' + i + '" data-correct="' + option.correct + '">' +
               '<span class="quiz-option-key" aria-hidden="true">' + String.fromCharCode(65 + i) + '</span>' +
-              '<span class="quiz-option-text">' + option.text + '</span>' +
+              '<span class="quiz-option-text">' + escapeHtml(option.text) + '</span>' +
             '</button>').join('') +
         '</div>' +
         '<p class="quiz-feedback" role="status" aria-live="polite">Escolha uma alternativa.</p>' +

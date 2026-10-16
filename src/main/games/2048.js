@@ -48,6 +48,7 @@ const TwoThousandFortyEight = (() => {
     phase = 'playing';
     targetReached = false;
     isAnimating = false;
+    setStatus('Jogo em andamento.');
     addRandomTile();
     addRandomTile();
   }

@@ -32,10 +32,10 @@ const VisualSequence = (() => {
   ];
 
   const MAX_LIVES = 3;
-  const STEP_MS = [1100, 1000, 900, 800, 720, 650, 590, 540, 500, 460];
-  // Tempo de resposta: começa em 5s e ganha 1s a cada fase superada.
-  const THINK_BASE_MS = 5000;
-  const THINK_STEP_MS = 1000;
+  // A sequência fica visível para memorização por 3s na primeira fase e ganha
+  // 0,5s a cada nível. O mesmo prazo é usado na resposta.
+  const MEMORIZE_BASE_MS = 3000;
+  const MEMORIZE_STEP_MS = 500;
   const COUNTDOWN_TICK_MS = 250;
 
   let container;
@@ -46,6 +46,7 @@ const VisualSequence = (() => {
   let lives = MAX_LIVES;
   let playing = false;
   let accepting = false;
+  let cancelRoundBar = null; // interrompe a barra da rodada em andamento
   const timers = new Set();
 
   // ── Utilidades ───────────────────────────────────────────
@@ -63,8 +64,8 @@ const VisualSequence = (() => {
   }
 
   function byId(id) { return ITEMS.find(item => item.id === id); }
-  function stepDelay() { return STEP_MS[Math.min(level - 1, STEP_MS.length - 1)]; }
-  function thinkMs() { return THINK_BASE_MS + THINK_STEP_MS * (level - 1); }
+  function memorizeMs() { return MEMORIZE_BASE_MS + MEMORIZE_STEP_MS * (level - 1); }
+  function thinkMs() { return memorizeMs(); }
 
   // ── Renderização ─────────────────────────────────────────
 
@@ -176,56 +177,65 @@ const VisualSequence = (() => {
     playing = true;
     accepting = false;
     renderStage();
-    container.querySelector('.vs-think-bar')?.style.setProperty('--vs-think', '100%');
     renderOptions();
     updateHud();
     showSequence();
   }
 
+  // Anima a barra de tempo: parte cheia e esvazia até zero no prazo dado.
+  // Devolve uma função que cancela a contagem (erro, acerto final, fim de jogo).
+  function runTimerBar(total, onTick, onEnd) {
+    const bar = container?.querySelector('.vs-think-bar');
+    const endsAt = Date.now() + total;
+    let cancelled = false;
+    const cancel = () => { cancelled = true; };
+    bar?.style.setProperty('--vs-think', '100%');
+
+    const tick = () => {
+      if (cancelled) return;
+      const left = Math.max(0, endsAt - Date.now());
+      bar?.style.setProperty('--vs-think', `${(left / total) * 100}%`);
+      if (left <= 0) return;
+      onTick?.(left, total);
+      track(setTimeout(tick, COUNTDOWN_TICK_MS));
+    };
+    tick();
+    track(setTimeout(() => { if (!cancelled) onEnd?.(); }, total));
+    return cancel;
+  }
+
+  function stopRoundBar() {
+    cancelRoundBar?.();
+    cancelRoundBar = null;
+  }
+
   function showSequence() {
     const stage = container.querySelector('.vs-stage');
     clearOptionFeedback();
+    // A sequência inteira aparece de uma vez e permanece visível durante
+    // todo o tempo de memorização; só então é escondida. A barra esvazia
+    // junto, para o jogador acompanhar o tempo restante.
     setStatus('Memorize a ordem das figuras…');
     stage.classList.remove('is-hidden');
-    [...stage.querySelectorAll('.vs-step')].forEach(step => step.classList.remove('is-showing'));
+    [...stage.querySelectorAll('.vs-step')].forEach(step => step.classList.add('is-showing'));
 
-    const delay = stepDelay();
-    order.forEach((_, index) => {
-      track(setTimeout(() => {
-        stage.querySelectorAll('.vs-step')[index]?.classList.add('is-showing');
-      }, 260 + index * delay));
-    });
-
-    track(setTimeout(startThinking, 260 + order.length * delay + 240));
+    stopRoundBar();
+    cancelRoundBar = runTimerBar(memorizeMs(), null, startThinking);
   }
 
-  // A sequência desaparece e o prazo começa a correr na mesma hora: o jogador
-  // já pode responder enquanto memoriza. O total de `thinkMs()` (5s na primeira
-  // fase, +1s por fase) é o tempo disponível para responder; estourar custa vida.
+  // A sequência desaparece, a barra reinicia cheia e esvazia durante a vez do
+  // jogador. O prazo é o mesmo da memorização; estourar custa vida.
   function startThinking() {
     const stage = container.querySelector('.vs-stage');
     [...stage.querySelectorAll('.vs-step')].forEach(step => step.classList.remove('is-showing'));
     stage.classList.add('is-hidden');
 
-    const total = thinkMs();
-    const endsAt = Date.now() + total;
-    const bar = container.querySelector('.vs-think-bar');
-    bar?.style.setProperty('--vs-think', '100%');
-
-    const tick = () => {
-      const left = Math.max(0, endsAt - Date.now());
-      // O `setTimeout` final (que encerra o prazo) roda no mesmo instante do
-      // último tique; retornar aqui evita sobrescrever o status da rodada.
-      if (left <= 0) return;
-      bar?.style.setProperty('--vs-think', `${(left / total) * 100}%`);
-      setStatus(`Repita a sequência! ${Math.ceil(left / 1000)}s`);
-      track(setTimeout(tick, COUNTDOWN_TICK_MS));
-    };
-
     // Sem espera: a resposta é liberada imediatamente, junto com o cronômetro.
     accepting = true;
-    tick();
-    track(setTimeout(timeUp, total));
+    stopRoundBar();
+    cancelRoundBar = runTimerBar(thinkMs(), left => {
+      setStatus(`Repita a sequência! ${Math.ceil(left / 1000)}s`);
+    }, timeUp);
   }
 
   // O prazo terminou com a sequência incompleta: mesmo efeito de um erro.
@@ -246,10 +256,10 @@ const VisualSequence = (() => {
 
     picked.push(id);
     markOptionUsed(id);
-    container.querySelector('.vs-stage')?.classList.remove('is-hidden');
 
     if (picked.length === order.length) {
       accepting = false;
+      stopRoundBar();
       setStatus(`Correto! Sequência de ${level} acertada. Prepare-se para a próxima.`);
       track(setTimeout(nextRound, 1000));
     }
@@ -257,6 +267,7 @@ const VisualSequence = (() => {
 
   function loseLife(chosen, expected) {
     accepting = false;
+    stopRoundBar();
     lives -= 1;
     updateHud();
     container.querySelector('.vs-think-bar')?.style.setProperty('--vs-think', '0%');

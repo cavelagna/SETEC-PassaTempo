@@ -82,7 +82,7 @@ try {
 } catch (_) {}
 
 let currentGame = null;
-const OVERLAY_GAMES = new Set(['two048', 'crossword', 'wordsearch', 'quiz']);
+const OVERLAY_GAMES = new Set(['two048', 'crossword', 'wordsearch', 'quiz', 'solitaire']);
 
 let notificationsEnabled = true;
 try { notificationsEnabled = localStorage.getItem('pt-a11y-notifications') !== 'false'; } catch (_) {}
@@ -146,7 +146,7 @@ const resultObserver = new MutationObserver(mutations => {
 resultObserver.observe(gameArea, { childList: true, subtree: true, characterData: true });
 
 gameArea.addEventListener('click', event => {
-  if (event.target.closest('.two048-restart, .crossword-restart, .word-search-restart, .quiz-again')) clearGameResult();
+  if (event.target.closest('.two048-restart, .crossword-restart, .word-search-restart, .quiz-again, .sol-new')) clearGameResult();
 });
 
 window.addEventListener('passatempo:home', showHome);

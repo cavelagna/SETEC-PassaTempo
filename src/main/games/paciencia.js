@@ -22,9 +22,10 @@ const Solitaire = (() => {
   }
   function render() {
     const s = state.selected;
+    const help = state.won ? 'Você venceu! Todas as cartas foram organizadas nas fundações.' : 'Monte os naipes em ordem crescente. Nas colunas, alterne cores em ordem decrescente.';
     const pile = (cards, index) => '<div class="sol-tableau-pile">' + cards.map((card, cardIndex) => '<div class="sol-tableau-card" style="top:' + (cardIndex * 25) + 'px;z-index:' + cardIndex + '" data-zone="tableau" data-pile="' + index + '" data-index="' + cardIndex + '">' + cardMarkup(card, s && s.zone === 'tableau' && s.pile === index && s.index === cardIndex) + '</div>').join('') + (cards.length ? '' : '<div class="sol-tableau-card sol-empty" data-zone="tableau" data-pile="' + index + '"></div>') + '</div>';
     const stockLayers = state.stock.length ? '<span class="sol-stack-layer sol-stack-layer--3"></span><span class="sol-stack-layer sol-stack-layer--2"></span>' : '';
-    container.innerHTML = '<section class="sol-game"><div class="sol-header"><div><p class="game-eyebrow">Klondike</p><h3>Paciência</h3></div><button class="game-action-btn sol-new">Novo jogo</button></div><p class="sol-help" role="status">Monte os naipes em ordem crescente. Nas colunas, alterne cores em ordem decrescente.</p><div class="sol-top"><div class="sol-stock" data-zone="stock" aria-label="Baralho com ' + state.stock.length + ' cartas">' + stockLayers + cardMarkup(state.stock.length ? { faceUp: false } : null, false) + '</div><div class="sol-waste" data-zone="waste">' + (state.waste.length ? '<span class="sol-stack-layer sol-stack-layer--2"></span>' : '') + cardMarkup(state.waste.at(-1), s && s.zone === 'waste') + '</div><div class="sol-spacer"></div><div class="sol-foundations">' + state.foundations.map((foundation, index) => '<div class="sol-foundation-slot" data-zone="foundation" data-pile="' + index + '" aria-label="Naipe de ' + SUITS[index].id + '">' + (foundation.length ? cardMarkup(foundation.at(-1), s && s.zone === 'foundation' && s.pile === index) : '<div class="sol-foundation-symbol">' + SUITS[index].symbol + '</div>') + '</div>').join('') + '</div></div><div class="sol-tableau">' + state.tableau.map(pile).join('') + '</div></section>';
+    container.innerHTML = '<section class="sol-game"><div class="sol-header"><div><p class="game-eyebrow">Klondike</p><h3>Paciência</h3></div><button class="game-action-btn sol-new">Novo jogo</button></div><p class="sol-help" role="status">' + help + '</p><div class="sol-top"><div class="sol-stock" data-zone="stock" aria-label="Baralho com ' + state.stock.length + ' cartas">' + stockLayers + cardMarkup(state.stock.length ? { faceUp: false } : null, false) + '</div><div class="sol-waste" data-zone="waste">' + (state.waste.length ? '<span class="sol-stack-layer sol-stack-layer--2"></span>' : '') + cardMarkup(state.waste.at(-1), s && s.zone === 'waste') + '</div><div class="sol-spacer"></div><div class="sol-foundations">' + state.foundations.map((foundation, index) => '<div class="sol-foundation-slot" data-zone="foundation" data-pile="' + index + '" aria-label="Naipe de ' + SUITS[index].id + '">' + (foundation.length ? cardMarkup(foundation.at(-1), s && s.zone === 'foundation' && s.pile === index) : '<div class="sol-foundation-symbol">' + SUITS[index].symbol + '</div>') + '</div>').join('') + '</div></div><div class="sol-tableau">' + state.tableau.map(pile).join('') + '</div></section>';
   }
   function source(zone, pile, index) {
     if (zone === 'waste') return state.waste.length ? { zone, cards: [state.waste.at(-1)] } : null;
@@ -44,14 +45,14 @@ const Solitaire = (() => {
     else if (from.zone === 'foundation') state.foundations[from.pile].pop();
     else { state.tableau[from.pile].splice(from.index); const top = state.tableau[from.pile].at(-1); if (top) top.faceUp = true; }
     if (zone === 'tableau') state.tableau[pile].push(...cards); else state.foundations[pile].push(cards[0]);
-    state.selected = null; state.won = state.foundations.every(cards => cards.length === 13); return true;
+    state.selected = null; state.won = state.foundations.every(cards => cards.length === 13); if (state.won) window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'win' } })); return true;
   }
   function click(event) {
     if (event.target.closest('.sol-new')) { newGame(); render(); return; }
     const target = event.target.closest('[data-zone]'); if (!target) return;
     const zone = target.dataset.zone, pile = Number(target.dataset.pile), index = Number(target.dataset.index);
     if (zone === 'stock') { if (state.stock.length) { const card = state.stock.pop(); card.faceUp = true; state.waste.push(card); } else { state.stock = state.waste.reverse().map(card => ({ ...card, faceUp: false })); state.waste = []; } state.selected = null; render(); return; }
-    if (state.selected && move(state.selected, zone, pile)) { render(); return; }
+    if (state.selected && (zone === 'tableau' || zone === 'foundation') && move(state.selected, zone, pile)) { render(); return; }
     state.selected = source(zone, pile, index); render();
   }
   function mount(el) { container = el; newGame(); render(); container.addEventListener('click', click); }
