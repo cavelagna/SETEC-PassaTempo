@@ -75,6 +75,13 @@
   --tone-7: #8F7761;
 }
 
+/* Hierarquia visual: o marrom-escuro passa a ser protagonista.
+   Os tons claros (bege/creme/off-white) funcionam como contraste. */
+:root {
+  --bg:            #f1ebdd;
+  --bg-card:       #faf7ee;
+}
+
 /* ── Modo Noturno ────────────────────────────────────────── */
 [data-theme="dark"] {
   --bg:           #2A2118;
@@ -2517,4 +2524,391 @@ body.drawer-open { overflow: hidden; }
   .vs-step-art svg { width: 30px; height: 30px; }
   .vs-option { min-height: 90px; }
   .vs-option-art svg { width: 34px; height: 34px; }
+}
+
+/* ══════════════════
+   Camada de transição ao entrar/sair dos jogos (GameTransition)
+   Fixa sobre a tela atual: desfoca o fundo, escurece em
+   marrom translúcido e mostra spinner + mensagem centralizados.
+   ══════════════════ */
+.game-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 900; /* acima da topbar (200) e do drawer (310) */
+  display: grid;
+  place-items: center;
+  background: rgba(42, 33, 24, 0.62);          /* marrom-escuro translúcido */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 220ms ease, visibility 0s linear 220ms;
+}
+.game-transition.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;                        /* bloqueia interações com o fundo */
+  transition: opacity 220ms ease;
+}
+.game-transition.is-leaving {
+  opacity: 0;
+  visibility: visible;
+  pointer-events: none;
+  transition: opacity 400ms ease;              /* equivale a TRANSITION_EXIT_MS */
+}
+
+.game-transition-inner {
+  display: grid;
+  justify-items: center;
+  gap: 1.1rem;
+  padding: 1.5rem;
+  text-align: center;
+  animation: gt-in 320ms ease-out both;
+}
+.game-transition.is-leaving .game-transition-inner { animation: none; }
+
+.game-transition-spinner {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 4px solid rgba(247, 244, 236, 0.25);
+  border-top-color: var(--brown-light, #C4A882);
+  animation: gt-spin 900ms linear infinite;
+}
+
+.game-transition-message {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  letter-spacing: 0.03em;
+  color: #f7f4ec;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes gt-spin { to { transform: rotate(360deg); } }
+@keyframes gt-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Semântica acessível: a mensagem é anunciada via role="status" */
+.game-transition[aria-hidden="true"] .game-transition-message { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .game-transition,
+  .game-transition.is-active,
+  .game-transition.is-leaving { transition-duration: 0.01ms !important; }
+  .game-transition-inner,
+  .game-transition-spinner { animation-duration: 0.01ms !important; }
+  .game-transition-spinner { animation-iteration-count: 1 !important; }
+}
+
+/* ═══════════════════════════
+   Mascote — Pinguim de cachecol (canto inferior direito)
+   ═══════════════════════════════════════════ */
+.mascot {
+  position: fixed;
+  right: max(0.75rem, env(safe-area-inset-right));
+  bottom: max(0.5rem, env(safe-area-inset-bottom));
+  z-index: 500; /* acima do conteúdo; abaixo da camada de transição (900) */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  pointer-events: none; /* contêiner transparente: não rouba cliques */
+}
+
+.mascot-bubble {
+  pointer-events: auto;
+  max-width: min(260px, 72vw);
+  padding: 0.7rem 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 14px 14px 4px 14px;
+  background: var(--bg-card);
+  color: var(--text-strong);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+.mascot-bubble.is-visible { opacity: 1; transform: translateY(0); }
+
+.mascot-body {
+  pointer-events: auto;
+  width: 88px;
+  height: 103px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 6px 10px rgba(48, 37, 31, 0.25));
+  transform-origin: 50% 90%;
+  transition: transform 220ms ease;
+}
+.mascot-body:hover { transform: translateY(-3px) scale(1.04); }
+.mascot-body:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 24px; }
+
+.mascot-body svg { width: 100%; height: 100%; display: block; }
+
+/* Paleta do pinguim (marrom-escuro da identidade no corpo) */
+.m-body  { fill: #30251f; }
+.m-belly { fill: #f7f4ec; }
+.m-feet  { fill: #e8a24a; }
+.m-beak  { fill: #f0b350; }
+.m-eye   { fill: #f7f4ec; }
+.m-pupil { fill: #2b211b; }
+.m-spark { fill: #ffffff; }
+.m-lid   { fill: #30251f; opacity: 0; }
+.mascot.is-blinking .m-lid { opacity: 1; }
+.m-scarf      { fill: #C4A882; }
+.m-scarf-tail { fill: #b3966f; }
+.m-wing       { fill: #262019; }
+
+/* Respiração sutil */
+.mascot .mascot-body svg { animation: mascot-breathe 4.2s ease-in-out infinite; transform-origin: 50% 92%; }
+@keyframes mascot-breathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.015, 0.985); }
+}
+
+/* Falando: inclinação de cabeça */
+.mascot-body.is-talking svg { animation: mascot-breathe 4.2s ease-in-out infinite, mascot-tilt 2.4s ease-in-out 1; }
+@keyframes mascot-tilt { 0%, 100% { rotate: 0deg; } 40% { rotate: 5deg; } 60% { rotate: -3deg; } }
+
+/* Comemorando */
+.mascot-body.is-happy svg { animation: mascot-breathe 4.2s ease-in-out infinite, mascot-jump 0.9s ease 3; }
+@keyframes mascot-jump {
+  0%, 100% { transform: translateY(0); }
+  35%      { transform: translateY(-10px); }
+  55%      { transform: translateY(0); }
+}
+.mascot-body.is-sad svg { animation: mascot-breathe 4.2s ease-in-out infinite; transform: rotate(-4deg); }
+
+/* Minimizado */
+.mascot.is-minimized .mascot-body,
+.mascot.is-minimized .mascot-bubble { display: none; }
+
+.mascot-minimize {
+  pointer-events: auto;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-brown);
+  color: var(--on-brown);
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color var(--transition), transform var(--transition);
+}
+.mascot-minimize:hover { background: var(--accent); transform: scale(1.08); }
+.mascot-minimize:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 600px) {
+  .mascot { transform: scale(0.85); transform-origin: bottom right; }
+  .mascot-bubble { max-width: 200px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot .mascot-body svg,
+  .mascot-body.is-talking svg,
+  .mascot-body.is-happy svg { animation: none !important; }
+  .mascot-bubble { transition-duration: 0.01ms; }
+  .mascot-body { transition-duration: 0.01ms; }
+}
+
+/* ═══════════════════════════
+   Rodapé — mais elegante, integrado à identidade marrom-escura
+   ═══════════════════════════════════════════ */
+.site-footer {
+  position: relative;
+  margin-top: 3.5rem;
+  text-align: left;
+  padding: 0;
+  background: linear-gradient(180deg, #3a2d22 0%, #30251f 55%, #262019 100%);
+  border-top: 1px solid rgba(196, 168, 130, 0.35);
+  color: #efe6d8;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  box-shadow: 0 -8px 24px rgba(48, 37, 31, 0.18);
+}
+.site-footer::before {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #C4A882 30%, #C4A882 70%, transparent);
+  opacity: 0.6;
+}
+
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 2.5rem;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 2.6rem var(--content-pad) 2rem;
+}
+
+.footer-brand-col { display: grid; gap: 0.4rem; align-content: start; }
+.footer-brand {
+  color: #f7f4ec;
+  font-family: var(--font-serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+.footer-tagline { color: rgba(239, 230, 216, 0.72); font-style: italic; font-family: var(--font-serif); }
+
+.footer-heading {
+  color: #C4A882;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid rgba(196, 168, 130, 0.25);
+}
+.footer-col p { margin: 0.25rem 0; color: rgba(239, 230, 216, 0.85); line-height: 1.6; }
+.footer-col strong { color: #f7f4ec; }
+
+.footer-base {
+  border-top: 1px solid rgba(196, 168, 130, 0.18);
+  padding: 0.9rem var(--content-pad);
+  text-align: center;
+  color: rgba(239, 230, 216, 0.55);
+  font-size: 0.74rem;
+}
+.footer-base p { margin: 0; }
+
+/* Entrada suave do rodapé quando entra na área visível */
+.site-footer {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 520ms ease, transform 520ms ease;
+}
+.site-footer.is-visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 760px) {
+  .footer-inner { grid-template-columns: 1fr; gap: 1.6rem; padding-block: 2rem 1.4rem; text-align: center; }
+  .footer-heading { display: inline-block; min-width: 120px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer { opacity: 1; transform: none; transition: none; }
+}
+
+/* ═══════════════════════════
+   Logo interativa — tilt 3D + sway ocasional
+   ═══════════════════════════════════════════ */
+.site-title-mark {
+  --logo-rx: 0deg;
+  --logo-ry: 0deg;
+  --logo-s: 1;
+  transform: translateY(-50%) perspective(600px) rotateX(var(--logo-rx)) rotateY(var(--logo-ry)) scale(var(--logo-s));
+  transition: transform 260ms ease-out, filter 260ms ease-out;
+  will-change: transform;
+  filter: drop-shadow(0 10px 22px rgba(48, 37, 31, 0.35));
+}
+.site-title-mark.is-swaying {
+  animation: logo-sway 1.8s ease-in-out;
+}
+@keyframes logo-sway {
+  0%, 100% { transform: translateY(-50%) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1); }
+  30%      { transform: translateY(-50%) perspective(600px) rotateX(4deg) rotateY(-9deg) scale(1.02); }
+  60%      { transform: translateY(-50%) perspective(600px) rotateX(-3deg) rotateY(7deg) scale(1.02); }
+}
+
+/* ═══════════════════════════
+   Banner — entrada em sequência (logo → título → textos)
+   ═══════════════════════════ */
+.site-header.will-enter .site-title-mark,
+.site-header.will-enter .site-title,
+.site-header.will-enter .site-subtitle {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: banner-in 560ms ease-out forwards;
+}
+.site-header.will-enter .site-title-mark { animation-delay: 60ms; }
+.site-header.will-enter .site-title { animation-delay: 220ms; }
+.site-header.will-enter .site-subtitle:nth-of-type(1) { animation-delay: 380ms; }
+.site-header.will-enter .site-subtitle:nth-of-type(2) { animation-delay: 500ms; }
+
+@keyframes banner-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Nota: a logo usa transform para o tilt; quando a animação termina,
+   o transform declarativo volta a valer normalmente. */
+.site-header { transition: box-shadow 320ms ease; }
+.site-header:hover { box-shadow: 0 10px 34px rgba(48, 37, 31, 0.30); }
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header.will-enter .site-title-mark,
+  .site-header.will-enter .site-title,
+  .site-header.will-enter .site-subtitle {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .site-title-mark { transform: translateY(-50%); }
+}
+
+/* ═══════════════════════════════════════════
+   Cards — profundidade, tilt sutil e entrada em sequência
+   ═══════════════════════════════════════════ */
+.game-card {
+  --card-rx: 0deg;
+  --card-ry: 0deg;
+  transform: translateY(0) perspective(700px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
+  transition:
+    transform 260ms ease-out,
+    box-shadow 260ms ease-out,
+    border-color 260ms ease-out,
+    background-color 260ms ease-out;
+  will-change: transform;
+}
+
+.game-card:hover {
+  transform: translateY(-5px) perspective(700px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
+  box-shadow: 0 12px 28px rgba(48, 37, 31, 0.20);
+  border-color: var(--brown-light);
+  background: color-mix(in srgb, var(--brown-pastel) 8%, var(--bg-card));
+}
+
+.game-card:hover .card-icon {
+  color: var(--accent);
+  transform: scale(1.12) rotate(-4deg);
+}
+.card-icon { transition: color var(--transition), transform 240ms ease; }
+
+.game-card:hover .card-btn {
+  background: var(--brown-pastel);
+  border-color: var(--brown-light);
+  box-shadow: 0 4px 10px rgba(48, 37, 31, 0.22);
+}
+
+/* Entrada em sequência via IntersectionObserver */
+.game-card.will-enter {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.game-card.will-enter.has-entered {
+  opacity: 1;
+  transform: translateY(0) perspective(700px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
+  transition:
+    opacity 460ms ease var(--enter-delay, 0ms),
+    transform 460ms ease var(--enter-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-card.will-enter { opacity: 1; transform: none; }
+  .game-card.will-enter.has-entered { opacity: 1; transform: none; transition: none; }
+  .game-card, .game-card:hover { transform: none; }
 }

@@ -74,6 +74,7 @@ const rulesSummary = document.getElementById('game-rules-summary');
 const rulesList = document.getElementById('game-rules-list');
 const rulesClose = document.getElementById('game-rules-close');
 const RULES_STORAGE_KEY = 'pt-game-rules-seen';
+const reduced_motion_media = window.matchMedia('(prefers-reduced-motion: reduce)');
 let seenGameRules = new Set();
 
 try {
@@ -83,6 +84,47 @@ try {
 
 let currentGame = null;
 const OVERLAY_GAMES = new Set(['two048', 'crossword', 'wordsearch', 'quiz', 'solitaire']);
+
+// ── Camada de transição ao entrar/sair dos jogos ────────────
+// Uma única camada fixa sobre a aplicação: desfoca o conteúdo ao fundo,
+// mostra spinner + mensagem curta e é encerrada logo após a navegação.
+const transitionLayer = document.getElementById('game-transition');
+const transitionMessage = document.getElementById('game-transition-message');
+const TRANSITION_DURATION = 620;   // deve casar com a duração das animações no CSS
+const TRANSITION_EXIT_MS  = 420;   // fade-out da camada após a troca de view
+let transitionTimer = null;
+let isTransitioning = false;
+
+function runTransition(message, onMid) {
+  if (isTransitioning) return;               // evita cliques repetidos
+  isTransitioning = true;
+  transitionMessage.textContent = message;
+  transitionLayer.classList.add('is-active');
+  transitionLayer.setAttribute('aria-hidden', 'false');
+
+  transitionTimer = window.setTimeout(() => {
+    onMid();                                 // troca a view com a tela coberta
+    transitionLayer.classList.remove('is-active');
+    transitionLayer.classList.add('is-leaving');
+    transitionTimer = window.setTimeout(() => {
+      transitionLayer.classList.remove('is-leaving');
+      transitionLayer.setAttribute('aria-hidden', 'true');
+      transitionMessage.textContent = '';
+      isTransitioning = false;
+      transitionTimer = null;
+    }, TRANSITION_EXIT_MS);
+  }, TRANSITION_DURATION);
+}
+
+function cancelTransition() {
+  if (transitionTimer) { window.clearTimeout(transitionTimer); transitionTimer = null; }
+  transitionLayer.classList.remove('is-active', 'is-leaving');
+  transitionLayer.setAttribute('aria-hidden', 'true');
+  transitionMessage.textContent = '';
+  isTransitioning = false;
+}
+
+window.addEventListener('pagehide', cancelTransition);
 
 let notificationsEnabled = true;
 try { notificationsEnabled = localStorage.getItem('pt-a11y-notifications') !== 'false'; } catch (_) {}
@@ -130,7 +172,10 @@ function showGameResult(result) {
   gameArea.appendChild(overlay);
 }
 
-window.addEventListener('passatempo:result', event => showGameResult(event.detail?.result));
+window.addEventListener('passatempo:result', event => {
+  showGameResult(event.detail?.result);
+  window.dispatchEvent(new CustomEvent('passatempo:gameresult', { detail: { result: event.detail?.result } }));
+});
 
 function clearGameResult() {
   gameArea?.querySelector('.game-result-overlay')?.remove();
@@ -162,9 +207,16 @@ topbarBrand.addEventListener('click', event => {
 // ─────────────────────────────────────────────────────────
 
 function showHome() {
+  // Saída de um jogo: mantém o jogo visível ao fundo durante a transição.
   if (currentGame) {
-    GAMES[currentGame].module.unmount();
-    currentGame = null;
+    runTransition('Voltando ao PassaTempo...', () => {
+      GAMES[currentGame].module.unmount();
+      currentGame = null;
+      viewGame.hidden = true;
+      viewHome.hidden = false;
+      document.title = 'PassaTempo';
+    });
+    return;
   }
   viewGame.hidden = true;
   viewHome.hidden = false;
@@ -175,28 +227,33 @@ function showGame(id) {
   const entry = GAMES[id];
   if (!entry) return;
 
-  // Desmonta o jogo anterior, se houver
-  if (currentGame && GAMES[currentGame]) {
-    GAMES[currentGame].module.unmount();
-  }
+  // Abertura síncrona e instantânea: usa uma duração visual curta e controlada.
+  runTransition('Preparando seu jogo...', () => {
+    // Desmonta o jogo anterior, se houver
+    if (currentGame && GAMES[currentGame]) {
+      GAMES[currentGame].module.unmount();
+    }
 
-  currentGame = id;
-  viewHome.hidden = true;
-  viewGame.hidden = false;
+    currentGame = id;
+    viewHome.hidden = true;
+    viewGame.hidden = false;
 
-  gameTitle.textContent = entry.title;
-  document.title = `${entry.title} — PassaTempo`;
+    gameTitle.textContent = entry.title;
+    document.title = `${entry.title} — PassaTempo`;
 
-  clearGameResult();
-  gameArea.innerHTML = '';
-  entry.module.mount(gameArea);
+    window.dispatchEvent(new CustomEvent('passatempo:game', { detail: { id, title: entry.title } }));
 
-  if (!seenGameRules.has(id)) showGameRules(id);
+    clearGameResult();
+    gameArea.innerHTML = '';
+    entry.module.mount(gameArea);
 
-  requestAnimationFrame(() => {
-    viewGame.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    if (rulesDialog.open) rulesDialog.querySelector('.game-rules-close').focus({ preventScroll: true });
-    else gameArea.focus({ preventScroll: true });
+    if (!seenGameRules.has(id)) showGameRules(id);
+
+    requestAnimationFrame(() => {
+      viewGame.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (rulesDialog.open) rulesDialog.querySelector('.game-rules-close').focus({ preventScroll: true });
+      else gameArea.focus({ preventScroll: true });
+    });
   });
 }
 
@@ -241,13 +298,118 @@ rulesDialog.addEventListener('click', event => {
   if (event.target === rulesDialog) rulesClose.click();
 });
 
+// ── LOGO INTERATIVA ─ tilt 3D + movimento espontâneo ─────
+(function initLogoTilt() {
+  const logo = document.querySelector('.site-title-mark');
+  if (!logo || reduced_motion_media.matches) return;
+  let rafId = null;
+
+  logo.addEventListener('pointermove', e => {
+    if (rafId) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      const rect = logo.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      logo.style.setProperty('--logo-rx', `${(-py * 10).toFixed(2)}deg`);
+      logo.style.setProperty('--logo-ry', `${(px * 12).toFixed(2)}deg`);
+      logo.style.setProperty('--logo-s', '1.04');
+    });
+  });
+
+  logo.addEventListener('pointerleave', () => {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+    logo.style.setProperty('--logo-rx', '0deg');
+    logo.style.setProperty('--logo-ry', '0deg');
+    logo.style.setProperty('--logo-s', '1');
+  });
+
+  // Movimento espontâneo ocasional (não conflita com hover: só quando fora dele)
+  let isHovering = false;
+  logo.addEventListener('pointerenter', () => { isHovering = true; });
+  logo.addEventListener('pointerleave', () => { isHovering = false; });
+  (function sway() {
+    window.setTimeout(() => {
+      if (!isHovering && !document.hidden) {
+        logo.classList.add('is-swaying');
+        window.setTimeout(() => logo.classList.remove('is-swaying'), 1800);
+      }
+      sway();
+    }, 9000 + Math.random() * 9000);
+  })();
+})();
+
+// ── CARDS ─ tilt sutil baseado no cursor ───────────────
+(function initCardTilt() {
+  if (reduced_motion_media.matches) return;
+  let raf = null;
+  document.querySelectorAll('.game-card').forEach(card => {
+    card.addEventListener('pointermove', e => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = null;
+        const rect = card.getBoundingClientRect();
+        const px = (e.clientX - rect.left) / rect.width - 0.5;
+        const py = (e.clientY - rect.top) / rect.height - 0.5;
+        card.style.setProperty('--card-rx', `${(-py * 3).toFixed(2)}deg`);
+        card.style.setProperty('--card-ry', `${(px * 4).toFixed(2)}deg`);
+      });
+    });
+    card.addEventListener('pointerleave', () => {
+      if (raf) { cancelAnimationFrame(raf); raf = null; }
+      card.style.setProperty('--card-rx', '0deg');
+      card.style.setProperty('--card-ry', '0deg');
+    });
+  });
+})();
+
+// ── ENTRADA EM SEQUÊNCIA: banner e cards ────────────────
+(function initEntrance() {
+  const header = document.querySelector('.site-header');
+  if (header && !reduced_motion_media.matches) header.classList.add('will-enter');
+
+  const cards = document.querySelectorAll('.game-card');
+  if (reduced_motion_media.matches || !('IntersectionObserver' in window)) return;
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const idx = [...cards].indexOf(entry.target);
+      entry.target.style.setProperty('--enter-delay', `${Math.min(idx * 60, 480)}ms`);
+      entry.target.classList.add('has-entered');
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.12 });
+
+  cards.forEach(card => { card.classList.add('will-enter'); observer.observe(card); });
+})();
+
+// ── Rodapé: entrada suave quando visível ────────────────
+(function initFooterReveal() {
+  const footer = document.querySelector('.site-footer');
+  if (!footer || reduced_motion_media.matches || !('IntersectionObserver' in window)) {
+    footer?.classList.add('is-visible');
+    return;
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { footer.classList.add('is-visible'); io.disconnect(); }
+    });
+  }, { threshold: 0.15 });
+  io.observe(footer);
+})();
+
 // ── Botões "Jogar" nos cards ──────────────────────────────
 document.querySelectorAll('.card-btn').forEach(btn => {
-  btn.addEventListener('click', () => showGame(btn.getAttribute('data-game')));
+  btn.addEventListener('click', () => {
+    if (!isTransitioning) showGame(btn.getAttribute('data-game'));
+  });
 });
 
 // ── Botão "Voltar" ────────────────────────────────────────
-backBtn.addEventListener('click', showHome);
+backBtn.addEventListener('click', () => {
+  if (!isTransitioning) showHome();
+});
 
 // ─────────────────────────────────────────────────────────
 // BUSCA EM TEMPO REAL

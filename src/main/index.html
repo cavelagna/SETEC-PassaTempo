@@ -103,7 +103,7 @@
     <nav class="drawer-nav" aria-label="Categorias e jogos">
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Lógica</button>
-        <ul class="drawer-games"><li><a href="#categoria-logica">Sudoku</a></li><li><a href="#categoria-logica" data-game="two048">2048</a></li></ul>
+        <ul class="drawer-games"><li><a href="#categoria-logica" data-game="sudoku">Sudoku</a></li><li><a href="#categoria-logica" data-game="two048">2048</a></li></ul>
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Memória</button>
@@ -111,7 +111,7 @@
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Clássicos</button>
-        <ul class="drawer-games"><li><a href="#categoria-classicos" data-game="snake">Snake</a></li><li><a href="#categoria-logica" data-game="minesweeper">Campo Minado</a></li><li><a href="#categoria-classicos" data-game="tictactoe">Jogo da Velha</a></li><li><a href="#categoria-classicos" data-game="checkers">Damas</a></li><li><a href="#categoria-classicos" data-game="chess">Xadrez</a></li><li><a href="#categoria-classicos">Paciência</a></li></ul>
+        <ul class="drawer-games"><li><a href="#categoria-classicos" data-game="snake">Snake</a></li><li><a href="#categoria-logica" data-game="minesweeper">Campo Minado</a></li><li><a href="#categoria-classicos" data-game="tictactoe">Jogo da Velha</a></li><li><a href="#categoria-classicos" data-game="checkers">Damas</a></li><li><a href="#categoria-classicos" data-game="chess">Xadrez</a></li><li><a href="#categoria-classicos" data-game="solitaire">Paciência</a></li></ul>
       </div>
       <div class="drawer-group">
         <button class="drawer-category" type="button" aria-expanded="false">Matemática</button>
@@ -367,12 +367,78 @@
   </dialog>
   <!-- ─── /Conteúdo principal ─────────────────────────────── -->
 
+  <!-- Camada de transição ao entrar/sair de um jogo (fica sobre a tela atual) -->
+  <div class="game-transition" id="game-transition" aria-hidden="true">
+    <div class="game-transition-inner">
+      <span class="game-transition-spinner" aria-hidden="true"></span>
+      <p class="game-transition-message" id="game-transition-message" role="status" aria-live="polite"></p>
+    </div>
+  </div>
+
+  <!-- ─── Mascote: pinguim de cachecol ─────────────────── -->
+  <div class="mascot" id="mascot" aria-hidden="false">
+    <div class="mascot-bubble" id="mascot-bubble" role="status" aria-live="polite" hidden>
+      <p class="mascot-bubble-text" id="mascot-bubble-text"></p>
+    </div>
+    <button class="mascot-body" id="mascot-btn" type="button" aria-label="Pinguim mascote do PassaTempo. Clique para receber uma mensagem" title="PassaTempo">
+      <svg viewBox="0 0 120 140" aria-hidden="true" focusable="false">
+        <!-- sombra -->
+        <ellipse class="m-shadow" cx="60" cy="132" rx="34" ry="7" fill="rgba(48,37,31,0.28)"/>
+        <!-- pés -->
+        <ellipse class="m-feet" cx="45" cy="126" rx="12" ry="6"/>
+        <ellipse class="m-feet" cx="75" cy="126" rx="12" ry="6"/>
+        <!-- corpo -->
+        <path class="m-body" d="M60 12 C92 12 102 44 100 78 C99 108 84 124 60 124 C36 124 21 108 20 78 C18 44 28 12 60 12 Z"/>
+        <!-- barriga -->
+        <path class="m-belly" d="M60 34 C80 34 88 58 87 84 C86 106 76 116 60 116 C44 116 34 106 33 84 C32 58 40 34 60 34 Z"/>
+        <!-- olhos -->
+        <g class="m-eyes">
+          <circle class="m-eye" cx="46" cy="42" r="8"/>
+          <circle class="m-eye" cx="74" cy="42" r="8"/>
+          <circle class="m-pupil" cx="48" cy="44" r="3.4"/>
+          <circle class="m-pupil" cx="76" cy="44" r="3.4"/>
+          <circle class="m-spark" cx="46.5" cy="41.5" r="1.3"/>
+          <circle class="m-spark" cx="74.5" cy="41.5" r="1.3"/>
+        </g>
+        <!-- pálpebras (piscar) -->
+        <g class="m-lids" aria-hidden="true">
+          <circle class="m-lid" cx="46" cy="42" r="9"/>
+          <circle class="m-lid" cx="74" cy="42" r="9"/>
+        </g>
+        <!-- bico -->
+        <path class="m-beak" d="M52 54 Q60 64 68 54 Q60 50 52 54 Z"/>
+        <!-- cachecol -->
+        <path class="m-scarf" d="M30 72 Q60 88 90 72 Q94 82 88 86 Q60 102 32 86 Q26 82 30 72 Z"/>
+        <path class="m-scarf-tail" d="M78 86 Q88 100 82 112 Q72 114 68 104 Q74 96 72 88 Z"/>
+        <!-- asas -->
+        <path class="m-wing m-wing-l" d="M24 62 C14 72 14 94 24 104 C30 98 32 82 24 62 Z"/>
+        <path class="m-wing m-wing-r" d="M96 62 C106 72 106 94 96 104 C90 98 88 82 96 62 Z"/>
+      </svg>
+    </button>
+    <button class="mascot-minimize" id="mascot-minimize" type="button" aria-label="Ocultar mascote" title="Ocultar mascote">−</button>
+  </div>
+
   <!-- ─── Rodapé ─────────────────────────────────────────── -->
   <footer class="site-footer" role="contentinfo">
-    <p class="footer-brand">PassaTempo</p>
-    <p><strong>Desenvolvido para a SETEC 2026</strong></p>
-    <p><strong>Desenvolvido por Giovanni Cavelagna</strong></p>
-    <p><strong>Colégio Estadual Barbosa Ferraz</strong></p>
+    <div class="footer-inner">
+      <div class="footer-col footer-brand-col">
+        <p class="footer-brand">PassaTempo</p>
+        <p class="footer-tagline">Jogue, pense, e simplesmente deixe o tempo passar...</p>
+      </div>
+      <div class="footer-col">
+        <p class="footer-heading">Projeto</p>
+        <p>Desenvolvido para a <strong>SETEC 2026</strong></p>
+        <p>Colégio Estadual Barbosa Ferraz</p>
+      </div>
+      <div class="footer-col">
+        <p class="footer-heading">Autoria</p>
+        <p><strong>Giovanni Cavelagna</strong></p>
+        <p>2° Desenvolvimento de Sistemas</p>
+      </div>
+    </div>
+    <div class="footer-base">
+      <p>PassaTempo — uma coleção de jogos clássicos para relaxar, pensar e passar o tempo.</p>
+    </div>
   </footer>
 
   <!-- Módulos dos jogos (carregados antes do orquestrador) -->
@@ -396,6 +462,9 @@
   <script src="games/quiz.js"></script>
   <script src="games/simon.js"></script>
   <script src="games/sequenciaVisual.js"></script>
+
+  <!-- Módulos compartilhados -->
+  <script src="mascot.js"></script>
 
   <!-- Orquestrador principal -->
   <script src="script.js"></script>
