@@ -209,7 +209,7 @@ topbarBrand.addEventListener('click', event => {
 function showHome() {
   // Saída de um jogo: mantém o jogo visível ao fundo durante a transição.
   if (currentGame) {
-    runTransition('Voltando ao PassaTempo...', () => {
+    runTransition('Carregando...', () => {
       GAMES[currentGame].module.unmount();
       currentGame = null;
       viewGame.hidden = true;
@@ -228,7 +228,7 @@ function showGame(id) {
   if (!entry) return;
 
   // Abertura síncrona e instantânea: usa uma duração visual curta e controlada.
-  runTransition('Preparando seu jogo...', () => {
+  runTransition('Carregando...', () => {
     // Desmonta o jogo anterior, se houver
     if (currentGame && GAMES[currentGame]) {
       GAMES[currentGame].module.unmount();
@@ -375,7 +375,7 @@ rulesDialog.addEventListener('click', event => {
     entries.forEach(entry => {
       if (!entry.isIntersecting) return;
       const idx = [...cards].indexOf(entry.target);
-      entry.target.style.setProperty('--enter-delay', `${Math.min(idx * 60, 480)}ms`);
+      entry.target.style.setProperty('--enter-delay', `${Math.min(idx * 25, 160)}ms`);
       entry.target.classList.add('has-entered');
       observer.unobserve(entry.target);
     });

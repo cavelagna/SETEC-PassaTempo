@@ -532,13 +532,12 @@ body.drawer-open { overflow: hidden; }
   transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
 
-.site-title-mark {
+.site-title-mark-wrap {
   position: absolute;
   top: 50%;
   left: 2.5rem;
   width: 200px;
   height: 200px;
-  object-fit: contain;
   transform: translateY(-50%);
 }
 
@@ -2026,13 +2025,17 @@ body.drawer-open { overflow: hidden; }
     padding: 3.5rem 1.25rem 2rem;
   }
 
-  .site-title-mark {
+  .site-title-mark-wrap {
     position: static;
-    display: block;
     width: 120px;
     height: 120px;
     margin: 0 auto 0.5rem;
     transform: none;
+  }
+
+  .site-title-mark {
+    width: 120px;
+    height: 120px;
   }
 
   .site-title { font-size: 34px; }
@@ -2806,11 +2809,24 @@ body.drawer-open { overflow: hidden; }
 /* ═══════════════════════════
    Logo interativa — tilt 3D + sway ocasional
    ═══════════════════════════════════════════ */
+.site-title-mark-wrap {
+  position: absolute;
+  top: 50%;
+  left: 2.5rem;
+  transform: translateY(-50%);
+  width: 200px;
+  height: 200px;
+}
+
 .site-title-mark {
+  position: static;
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
   --logo-rx: 0deg;
   --logo-ry: 0deg;
   --logo-s: 1;
-  transform: translateY(-50%) perspective(600px) rotateX(var(--logo-rx)) rotateY(var(--logo-ry)) scale(var(--logo-s));
+  transform: perspective(600px) rotateX(var(--logo-rx)) rotateY(var(--logo-ry)) scale(var(--logo-s));
   transition: transform 260ms ease-out, filter 260ms ease-out;
   will-change: transform;
   filter: drop-shadow(0 10px 22px rgba(48, 37, 31, 0.35));
@@ -2819,9 +2835,9 @@ body.drawer-open { overflow: hidden; }
   animation: logo-sway 1.8s ease-in-out;
 }
 @keyframes logo-sway {
-  0%, 100% { transform: translateY(-50%) perspective(600px) rotateX(0deg) rotateY(0deg) scale(1); }
-  30%      { transform: translateY(-50%) perspective(600px) rotateX(4deg) rotateY(-9deg) scale(1.02); }
-  60%      { transform: translateY(-50%) perspective(600px) rotateX(-3deg) rotateY(7deg) scale(1.02); }
+  0%, 100% { transform: perspective(600px) rotateX(0deg) rotateY(0deg) scale(1); }
+  30%      { transform: perspective(600px) rotateX(4deg) rotateY(-9deg) scale(1.02); }
+  60%      { transform: perspective(600px) rotateX(-3deg) rotateY(7deg) scale(1.02); }
 }
 
 /* ═══════════════════════════
@@ -2832,12 +2848,12 @@ body.drawer-open { overflow: hidden; }
 .site-header.will-enter .site-subtitle {
   opacity: 0;
   transform: translateY(12px);
-  animation: banner-in 560ms ease-out forwards;
+  animation: banner-in 360ms ease-out forwards;
 }
-.site-header.will-enter .site-title-mark { animation-delay: 60ms; }
-.site-header.will-enter .site-title { animation-delay: 220ms; }
-.site-header.will-enter .site-subtitle:nth-of-type(1) { animation-delay: 380ms; }
-.site-header.will-enter .site-subtitle:nth-of-type(2) { animation-delay: 500ms; }
+.site-header.will-enter .site-title-mark { animation-delay: 40ms; }
+.site-header.will-enter .site-title { animation-delay: 140ms; }
+.site-header.will-enter .site-subtitle:nth-of-type(1) { animation-delay: 240ms; }
+.site-header.will-enter .site-subtitle:nth-of-type(2) { animation-delay: 320ms; }
 
 @keyframes banner-in {
   from { opacity: 0; transform: translateY(12px); }
@@ -2857,7 +2873,7 @@ body.drawer-open { overflow: hidden; }
     opacity: 1;
     transform: none;
   }
-  .site-title-mark { transform: translateY(-50%); }
+  .site-title-mark { transform: none; }
 }
 
 /* ═══════════════════════════════════════════
@@ -2874,6 +2890,39 @@ body.drawer-open { overflow: hidden; }
     background-color 260ms ease-out;
   will-change: transform;
 }
+
+/* Estilo peça de dominó: fundação creme, divisória central e pontos */
+.game-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 1.1rem 4.55rem 1.1rem;   /* divisória acima do botão Jogar */
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    color-mix(in srgb, var(--surface-brown) 45%, transparent) 18%,
+    color-mix(in srgb, var(--surface-brown) 45%, transparent) 82%,
+    transparent);
+  pointer-events: none;
+}
+
+.game-card::before { height: 5px; }  /* faixa superior mais presente, como a borda da peça */
+
+/* Pontinhos decorativos de dominó, um em cada canto superior da peça */
+.game-card .card-top::after {
+  content: '';
+  position: absolute;
+  top: -0.2rem;
+  right: 0;
+  width: 26px;
+  height: 26px;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--surface-brown) 42%, transparent) 2.2px, transparent 2.6px);
+  background-size: 9px 9px;
+  background-position: center;
+  opacity: .5;
+  pointer-events: none;
+}
+.game-card .card-top { position: relative; }
 
 .game-card:hover {
   transform: translateY(-5px) perspective(700px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
@@ -2894,17 +2943,17 @@ body.drawer-open { overflow: hidden; }
   box-shadow: 0 4px 10px rgba(48, 37, 31, 0.22);
 }
 
-/* Entrada em sequência via IntersectionObserver */
+/* Entrada em sequência via IntersectionObserver — rápida */
 .game-card.will-enter {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(14px);
 }
 .game-card.will-enter.has-entered {
   opacity: 1;
   transform: translateY(0) perspective(700px) rotateX(var(--card-rx)) rotateY(var(--card-ry));
   transition:
-    opacity 460ms ease var(--enter-delay, 0ms),
-    transform 460ms ease var(--enter-delay, 0ms);
+    opacity 220ms ease var(--enter-delay, 0ms),
+    transform 220ms ease var(--enter-delay, 0ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2912,3 +2961,29 @@ body.drawer-open { overflow: hidden; }
   .game-card.will-enter.has-entered { opacity: 1; transform: none; transition: none; }
   .game-card, .game-card:hover { transform: none; }
 }
+
+/* ═══════════════════
+   Pinguim — visibilidade no modo noturno
+   No tema escuro o corpo marrom-escuro se camufla no fundo;
+   aqui apenas nesse tema destacamos sombra, contorno e olhos.
+   ═══════════════════════ */
+[data-theme="dark"] .mascot .mascot-body {
+  filter:
+    drop-shadow(0 0 1.5px rgba(237, 227, 216, 0.55))
+    drop-shadow(0 0 10px rgba(0, 0, 0, 0.65))
+    drop-shadow(0 7px 12px rgba(0, 0, 0, 0.55));
+}
+[data-theme="dark"] .mascot .m-shadow {
+  fill: rgba(0, 0, 0, 0.65);
+  transform: scale(1.12);
+  transform-origin: 60px 132px;
+}
+[data-theme="dark"] .mascot .m-body {
+  fill: #17110d;
+  stroke: rgba(237, 227, 216, 0.5);
+  stroke-width: 1.6;
+}
+[data-theme="dark"] .mascot .m-wing { fill: #100b08; }
+[data-theme="dark"] .mascot .m-eye  { fill: #fffdf8; }
+[data-theme="dark"] .mascot .m-pupil { fill: #0d0a07; }
+[data-theme="dark"] .mascot .m-belly { fill: #f2ead9; }
