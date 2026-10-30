@@ -183,22 +183,65 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--topbar-h) + var(--topbar-gap) + 2rem);
+  overflow-x: hidden;
 }
 
 body {
   background-color: var(--bg);
-  background-image: radial-gradient(rgba(128, 112, 96, 0.055) 0.55px, transparent 0.7px);
-  background-size: 7px 7px;
+  /* Degradê vivo: luz quente no topo, marrom profundo embaixo */
+  background-image:
+    radial-gradient(1100px 520px at 12% -8%, rgba(232, 178, 116, 0.22), transparent 62%),
+    radial-gradient(900px 480px at 88% 4%, rgba(196, 168, 130, 0.18), transparent 60%),
+    radial-gradient(1200px 700px at 50% 118%, rgba(74, 57, 43, 0.30), transparent 65%),
+    linear-gradient(180deg, #f6efdf 0%, #f1e8d4 34%, #e9dcc0 72%, #e2d2b2 100%);
+  background-attachment: fixed;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 1rem;
   line-height: 1.7;
   min-height: 100vh;
+  overflow-x: hidden;
   transition: background-color var(--transition), color var(--transition);
 }
 
-[data-theme="dark"] body { background-image: radial-gradient(rgba(237, 227, 216, 0.035) 0.55px, transparent 0.7px); }
+/* Luzes que respiram lentamente sobre o degradê do fundo */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(560px 380px at 18% 30%, rgba(232, 162, 74, 0.14), transparent 60%),
+    radial-gradient(640px 420px at 78% 62%, rgba(196, 168, 130, 0.13), transparent 62%),
+    radial-gradient(480px 340px at 46% 86%, rgba(148, 124, 108, 0.10), transparent 60%);
+  animation: bg-lights 26s ease-in-out infinite alternate;
+}
+@keyframes bg-lights {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: .8; }
+  50%  { transform: translate3d(2.5%, -2%, 0) rotate(3deg) scale(1.05); opacity: 1; }
+  100% { transform: translate3d(-2%, 2.5%, 0) rotate(-3deg) scale(1.02); opacity: .85; }
+}
+
+/* Variantes de tema: mesmo esquema de luzes, adaptado a cada paleta */
+[data-theme="dark"] body {
+  background-image:
+    radial-gradient(1100px 520px at 12% -8%, rgba(196, 168, 130, 0.10), transparent 62%),
+    radial-gradient(900px 480px at 88% 4%, rgba(148, 124, 108, 0.14), transparent 60%),
+    radial-gradient(1200px 700px at 50% 118%, rgba(18, 13, 9, 0.55), transparent 65%),
+    linear-gradient(180deg, #32271c 0%, #2a2118 40%, #231b13 100%);
+}
+[data-theme="dark"] body::before {
+  background:
+    radial-gradient(560px 380px at 18% 30%, rgba(196, 168, 130, 0.10), transparent 60%),
+    radial-gradient(640px 420px at 78% 62%, rgba(138, 116, 101, 0.12), transparent 62%),
+    radial-gradient(480px 340px at 46% 86%, rgba(232, 178, 116, 0.07), transparent 60%);
+}
 [data-theme="high-contrast"] body { background-image: none; }
+[data-theme="high-contrast"] body::before { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  body::before { animation: none; }
+}
 
 /* Skip link (acessibilidade) */
 .skip-link {
@@ -520,16 +563,50 @@ body.drawer-open { overflow: hidden; }
 }
 
 /* ── Header / Hero ───────────────────────────────────────── */
+/* ── Header / Hero ───────────────────────────────────── */
 .site-header {
-  position: relative;
+  position: sticky;
+  top: calc(var(--topbar-h) + var(--topbar-gap) * 2);
+  z-index: 90;
   text-align: center;
   padding: 4.75rem 2rem 3.25rem;
-  background: var(--surface-brown);
-  border: 1px solid var(--surface-brown);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius);
   margin-bottom: 2.25rem;
-  transition: background-color var(--transition), border-color var(--transition), box-shadow var(--transition);
+  overflow: hidden;
+  /* Degradê animado e suave: sem caixa sólida, apenas luz marrom/caramelo */
+  background:
+    radial-gradient(120% 140% at 15% 0%, rgba(196, 168, 130, 0.38), transparent 55%),
+    radial-gradient(120% 150% at 85% 10%, rgba(138, 106, 74, 0.30), transparent 60%),
+    linear-gradient(160deg, rgba(74, 57, 43, 0.92), rgba(107, 81, 56, 0.85) 45%, rgba(148, 116, 82, 0.82));
+  background-size: 100% 100%, 100% 100%, 300% 300%;
+  animation: header-flow 16s ease-in-out infinite;
+  box-shadow:
+    0 18px 40px rgba(48, 37, 31, 0.22),
+    inset 0 1px 0 rgba(247, 244, 236, 0.18);
+  transition: box-shadow var(--transition);
+}
+@keyframes header-flow {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Brilho suave que atravessa o header (reflexo de luz) */
+.site-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 252, 240, 0.16), transparent);
+  transform: skewX(-14deg);
+  animation: header-shine 7s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes header-shine {
+  0%, 55%  { left: -60%; }
+  85%, 100% { left: 130%; }
 }
 
 .site-title-mark-wrap {
@@ -2863,7 +2940,59 @@ body.drawer-open { overflow: hidden; }
 /* Nota: a logo usa transform para o tilt; quando a animação termina,
    o transform declarativo volta a valer normalmente. */
 .site-header { transition: box-shadow 320ms ease; }
-.site-header:hover { box-shadow: 0 10px 34px rgba(48, 37, 31, 0.30); }
+.site-header:hover { box-shadow: 0 22px 48px rgba(48, 37, 31, 0.38), inset 0 1px 0 rgba(247, 244, 236, 0.25); }
+
+[data-theme="high-contrast"] .site-header {
+  background: #000;
+  animation: none;
+}
+[data-theme="high-contrast"] .site-header::after { display: none; }
+[data-theme="dark"] .site-header {
+  background: linear-gradient(120deg, #1f1710, #34281b, #4a392b, #34281b, #1f1710);
+  background-size: 300% 300%;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header { animation: none; background-position: 30% 50%; }
+  .site-header::after { display: none; }
+}
+
+/* ═══ Canvas de partículas (bolinhas ambiente + confete) ═══ */
+.fx-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;                 /* atrás do conteúdo, acima do fundo */
+  pointer-events: none;
+}
+#main-content, .topbar, .site-footer { position: relative; z-index: 1; }
+
+/* ═══ Fundo decorativo: desenhos de jogos estilo marca-d'água ═══ */
+.bg-doodles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;                  /* atrás de todo o conteúdo (mesma camada do fx-canvas) */
+  pointer-events: none;
+  overflow: hidden;
+  color: #8c6b52;              /* marrom claro/caramelo do traço */
+}
+[data-theme="dark"] .bg-doodles { color: #C4A882; }
+[data-theme="high-contrast"] .bg-doodles { display: none; }
+
+.bg-doodle {
+  position: absolute;
+  display: block;
+}
+.bg-doodle svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 700px) {
+  .bg-doodle { transform: scale(0.62) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* desenho estático: nada a fazer, já não há animação aqui */
+}
 
 @media (prefers-reduced-motion: reduce) {
   .site-header.will-enter .site-title-mark,
@@ -2987,3 +3116,37 @@ body.drawer-open { overflow: hidden; }
 [data-theme="dark"] .mascot .m-eye  { fill: #fffdf8; }
 [data-theme="dark"] .mascot .m-pupil { fill: #0d0a07; }
 [data-theme="dark"] .mascot .m-belly { fill: #f2ead9; }
+
+/* ── Tema claro (padrão): destacar o pinguim do fundo quente ──
+   No tema marrom-quente o corpo #30251f camufla com o fundo.
+   Aqui reforçamos contorno claro, sombra visível e brilho nos olhos
+   sem alterar os temas escuro e alto contraste. */
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .mascot-body {
+  filter:
+    drop-shadow(0 0 1px rgba(255, 252, 245, 0.9))
+    drop-shadow(0 0 2.5px rgba(48, 37, 31, 0.45))
+    drop-shadow(0 8px 14px rgba(70, 55, 40, 0.35));
+}
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .m-shadow {
+  fill: rgba(40, 30, 22, 0.5);
+  transform: scale(1.1);
+  transform-origin: 60px 132px;
+}
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .m-body {
+  fill: #241a14;
+  stroke: rgba(255, 251, 242, 0.95);
+  stroke-width: 2;
+}
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .m-wing {
+  fill: #1a130e;
+  stroke: rgba(255, 251, 242, 0.55);
+  stroke-width: 1.2;
+}
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .m-eye  { fill: #fffdf8; }
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .m-pupil { fill: #17110d; }
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .m-spark { fill: #ffffff; }
+:root:not([data-theme="dark"]):not([data-theme="high-contrast"]) .mascot .m-belly {
+  fill: #fdfaf3;
+  stroke: rgba(48, 37, 31, 0.25);
+  stroke-width: 1;
+}

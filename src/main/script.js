@@ -399,6 +399,63 @@ rulesDialog.addEventListener('click', event => {
   io.observe(footer);
 })();
 
+// ── FUNDO DECORATIVO: antigo clube de jogos ────────────────
+// Ilustrações SVG de traço fino (xadrez, dados, cartas, dominó,
+// quebra-cabeça, sudoku) espalhadas como marcas-d'água.
+(function initBackdropDoodles() {
+  const STROKE = 'currentColor';
+  const svgs = {
+    chessKing: `<svg viewBox="0 0 40 64" fill="none" stroke="${STROKE}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4v6M17 7h6M20 10c-4 3-6 6-6 10h12c0-4-2-7-6-10Z"/><path d="M14 20c-3 6-3 14 0 20h12c3-6 3-14 0-20"/><path d="M12 40h16l2 8H10l2-8Z"/><path d="M8 48h24v6H8zM12 54h16l-2 6H14l-2-6Z"/></svg>`,
+    chessQueen: `<svg viewBox="0 0 44 64" fill="none" stroke="${STROKE}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="10" r="2.4"/><circle cx="22" cy="6" r="2.4"/><circle cx="36" cy="10" r="2.4"/><path d="M8 12c2 6 10 12 12 8M36 12c-2 6-10 12-12 8"/><path d="M13 24c-2 8-2 14 1 20h16c3-6 3-12 1-20"/><path d="M11 44h22l2 8H9l2-8Z"/><path d="M8 52h28v6H8z"/></svg>`,
+    chessKnight: `<svg viewBox="0 0 40 60" fill="none" stroke="${STROKE}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 54c0-14 2-24 8-30-2-4-2-8 2-10l2 4c6 0 12 6 12 16 0 6-2 10-4 20"/><path d="M22 14l-2-6M26 20c2 0 4 2 4 4"/><circle cx="26" cy="22" r="1.2"/><path d="M10 54h22v4H10z"/></svg>`,
+    chessPawn: `<svg viewBox="0 0 36 56" fill="none" stroke="${STROKE}" stroke-width="1.6" stroke-linecap="round"><circle cx="18" cy="12" r="6"/><path d="M14 18c-2 6-2 12 1 18h6c3-6 3-12 1-18"/><path d="M10 36h16l2 8H8l2-8Z"/><path d="M8 44h20v6H8zM11 50h14v4H11z"/></svg>`,
+    dice5: `<svg viewBox="0 0 48 48" fill="none" stroke="${STROKE}" stroke-width="1.6"><rect x="4" y="4" width="40" height="40" rx="8"/><circle cx="15" cy="15" r="3"/><circle cx="33" cy="15" r="3"/><circle cx="24" cy="24" r="3"/><circle cx="15" cy="33" r="3"/><circle cx="33" cy="33" r="3"/></svg>`,
+    dice3: `<svg viewBox="0 0 48 48" fill="none" stroke="${STROKE}" stroke-width="1.6"><rect x="4" y="4" width="40" height="40" rx="8" transform="rotate(8 24 24)"/><circle cx="16" cy="17" r="3"/><circle cx="25" cy="25" r="3"/><circle cx="34" cy="33" r="3"/></svg>`,
+    dice6: `<svg viewBox="0 0 48 48" fill="none" stroke="${STROKE}" stroke-width="1.6"><rect x="4" y="4" width="40" height="40" rx="8" transform="rotate(-10 24 24)"/><circle cx="16" cy="14" r="3"/><circle cx="16" cy="24" r="3"/><circle cx="16" cy="34" r="3"/><circle cx="33" cy="14" r="3"/><circle cx="33" cy="24" r="3"/><circle cx="33" cy="34" r="3"/></svg>`,
+    cardA: `<svg viewBox="0 0 40 56" fill="none" stroke="${STROKE}" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="2" width="34" height="52" rx="5" transform="rotate(-8 20 28)"/><path d="M21 16l5 8c2 3-1 7-5 4-4 3-7-1-5-4l5-8Z"/><path d="M16 40l4-6 4 6"/></svg>`,
+    cardK: `<svg viewBox="0 0 40 56" fill="none" stroke="${STROKE}" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="2" width="34" height="52" rx="5" transform="rotate(10 20 28)"/><path d="M14 18h12M20 18v20"/><path d="M13 44c3-4 11-4 14 0"/><circle cx="20" cy="30" r="4"/></svg>`,
+    domino: `<svg viewBox="0 0 36 60" fill="none" stroke="${STROKE}" stroke-width="1.6"><rect x="3" y="2" width="30" height="56" rx="6" transform="rotate(6 18 30)"/><line x1="6" y1="30" x2="31" y2="32"/><circle cx="15" cy="15" r="2.6"/><circle cx="23" cy="20" r="2.6"/><circle cx="17" cy="44" r="2.6"/><circle cx="23" cy="38" r="2.6"/></svg>`,
+    puzzle: `<svg viewBox="0 0 52 52" fill="none" stroke="${STROKE}" stroke-width="1.6" stroke-linejoin="round"><path d="M6 6h14a5 5 0 1 1 10 0h14v14a5 5 0 1 0 0 10v14H30a5 5 0 1 0-10 0H6V30a5 5 0 1 1 0-10V6Z"/></svg>`,
+    sudoku: `<svg viewBox="0 0 44 44" fill="none" stroke="${STROKE}" stroke-width="1.4"><rect x="3" y="3" width="38" height="38" rx="3"/><path d="M16 3v38M30 3v38M3 16h38M3 30h38" stroke-width="2"/><text x="8" y="13" font-size="9" font-family="serif" fill="${STROKE}" stroke="none">5</text><text x="34" y="41" font-size="9" font-family="serif" fill="${STROKE}" stroke="none">3</text></svg>`,
+    meeples: `<svg viewBox="0 0 48 48" fill="none" stroke="${STROKE}" stroke-width="1.6"><circle cx="16" cy="14" r="6"/><path d="M6 40c0-7 4-12 10-12s10 5 10 12"/><circle cx="34" cy="18" r="5"/><path d="M26 42c0-6 4-10 8-10s8 4 8 10"/></svg>`,
+    spinner: `<svg viewBox="0 0 48 48" fill="none" stroke="${STROKE}" stroke-width="1.6"><circle cx="24" cy="24" r="18"/><path d="M24 6v10M24 32v10M6 24h10M32 24h10"/><path d="M24 24l9 9"/></svg>`,
+    meeples2: `<svg viewBox="0 0 48 48" fill="none" stroke="${STROKE}" stroke-width="1.6"><circle cx="24" cy="16" r="7"/><path d="M12 42c0-8 5-13 12-13s12 5 12 13"/></svg>`,
+  };
+
+  // Posições orgânicas (%, tamanho e rotação variados), evitando o centro-superior
+  // onde ficam título/busca, e o miolo denso dos cards.
+  const placements = [
+    ['chessKing',   3,  14,  92, -14], ['dice5',     22, 4,  46,  12],
+    ['chessPawn',  44,  3,  60,   9], ['cardA',     70, 8,  78, -10],
+    ['domino',     90, 18,  84,  14], ['sudoku',     8, 36,  74,  -6],
+    ['puzzle',     92, 46,  96,  10], ['dice3',     30, 46,  54, -12],
+    ['meeples',    60, 42,  64,   6], ['cardK',     48, 56,  70,   8],
+    ['chessQueen',  4,  62, 104,  -8], ['spinner',   78, 62,  58, -14],
+    ['dice6',      24, 76,  66,  10], ['chessKnight', 56, 74, 96, -12],
+    ['puzzle',     86, 84,  70,   8], ['domino',     10, 90,  62, 12],
+    ['sudoku',     40, 90,  52,  -6], ['chessPawn', 68, 92,  58, 10],
+    ['dice5',      92, 68,  44,  -8], ['cardA',      2, 48,  66, 12],
+    ['meeples2',   34, 34,  46, -10],
+  ];
+
+  const layer = document.createElement('div');
+  layer.className = 'bg-doodles';
+  layer.setAttribute('aria-hidden', 'true');
+
+  placements.forEach(([key, x, y, size, rot], i) => {
+    const span = document.createElement('span');
+    span.className = 'bg-doodle';
+    span.innerHTML = svgs[key];
+    span.style.left = `${x}%`;
+    span.style.top = `${y}%`;
+    span.style.width = `${size}px`;
+    span.style.transform = `rotate(${rot}deg)`;
+    span.style.opacity = (0.05 + (i % 4) * 0.012).toFixed(3); // 0.05–0.086
+    layer.appendChild(span);
+  });
+
+  document.body.appendChild(layer);
+})();
 // ── Botões "Jogar" nos cards ──────────────────────────────
 document.querySelectorAll('.card-btn').forEach(btn => {
   btn.addEventListener('click', () => {
