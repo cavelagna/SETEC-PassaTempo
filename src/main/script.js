@@ -448,7 +448,7 @@ rulesDialog.addEventListener('click', event => {
     span.innerHTML = svgs[key];
     span.style.left = `${x}%`;
     span.style.top = `${y}%`;
-    span.style.width = `${size}px`;
+    span.style.width = `${Math.round(size * 1.45)}px`;   // imagens maiores
     span.style.transform = `rotate(${rot}deg)`;
     span.style.opacity = (0.05 + (i % 4) * 0.012).toFixed(3); // 0.05–0.086
     layer.appendChild(span);

@@ -1211,9 +1211,9 @@ body.drawer-open { overflow: hidden; }
 .bp-hold, .bp-pause { width: 100%; font-size: .7rem; padding: .4rem .3rem; }
 .bp-hold:disabled { opacity: .5; cursor: not-allowed; transform: none; }
 
-.bp-board { display: grid; grid-template-columns: repeat(10, 1fr); width: min(100%, 15rem); aspect-ratio: 10 / 18; margin-inline: auto; border: 4px solid var(--surface-brown); border-radius: var(--radius-sm); background: var(--tetris-grid); overflow: hidden; touch-action: none; }
-.bp-cell { min-width: 0; }
-.bp-cell.is-empty { background: transparent; }
+.bp-board { display: grid; grid-template-columns: repeat(10, 1fr); width: min(100%, 15rem); aspect-ratio: 10 / 18; margin-inline: auto; border: 4px solid var(--surface-brown); border-radius: var(--radius-sm); background: color-mix(in srgb, var(--surface-brown) 7%, var(--bg-card)); overflow: hidden; touch-action: none; gap: 1px; }
+.bp-cell { min-width: 0; background-image: linear-gradient(var(--tetris-grid) 1px, transparent 1px), linear-gradient(90deg, var(--tetris-grid) 1px, transparent 1px); background-size: 100% 100%; }
+.bp-cell.is-empty { background-color: transparent; }
 .bp-cell.is-filled { background: var(--tone-1); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tetris-block-2) 55%, transparent); }
 .bp-cell.tone-2 { background: var(--tone-2); }
 .bp-cell.tone-3 { background: var(--tone-3); }
@@ -2092,7 +2092,7 @@ body.drawer-open { overflow: hidden; }
 /* ── Responsivo ──────────────────────────────────────────── */
 @media (max-width: 600px) {
   :root {
-    --topbar-gap: 10px;
+    --topbar-gap: 20px;
   }
 
   .topbar-brand { display: none; }
@@ -2963,7 +2963,7 @@ body.drawer-open { overflow: hidden; }
   z-index: 0;                 /* atrás do conteúdo, acima do fundo */
   pointer-events: none;
 }
-#main-content, .topbar, .site-footer { position: relative; z-index: 1; }
+#main-content, .site-footer { position: relative; z-index: 1; }
 
 /* ═══ Fundo decorativo: desenhos de jogos estilo marca-d'água ═══ */
 .bg-doodles {
@@ -2972,23 +2972,25 @@ body.drawer-open { overflow: hidden; }
   z-index: 0;                  /* atrás de todo o conteúdo (mesma camada do fx-canvas) */
   pointer-events: none;
   overflow: hidden;
-  color: #8c6b52;              /* marrom claro/caramelo do traço */
+  color: #6f523b;              /* traço marrom mais presente */
 }
-[data-theme="dark"] .bg-doodles { color: #C4A882; }
+[data-theme="dark"] .bg-doodles { color: #efe6d8; }   /* branco-creme no tema escuro */
 [data-theme="high-contrast"] .bg-doodles { display: none; }
 
 .bg-doodle {
   position: absolute;
   display: block;
+  opacity: 0.14;               /* multiplicador: realça o traço */
 }
 .bg-doodle svg {
   display: block;
   width: 100%;
   height: auto;
+  stroke-width: 1.35;          /* engrossa levemente o traço */
 }
 
 @media (max-width: 700px) {
-  .bg-doodle { transform: scale(0.62) !important; }
+  .bg-doodle { transform: scale(0.78) !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   /* desenho estático: nada a fazer, já não há animação aqui */
