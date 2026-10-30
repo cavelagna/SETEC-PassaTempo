@@ -714,7 +714,46 @@ body.drawer-open { overflow: hidden; }
   font-size: 0.9rem;
 }
 
-/* ── Cards ───────────────────────────────────────────────── */
+/* ── Cards ─────────────────────────────────────────────── */
+.card-image {
+  display: block;
+  width: calc(100% + 3.4rem);       /* sangra até as bordas internas do card */
+  margin: -0.6rem -1.7rem 0;        /* encosta na borda do card, sob a faixa superior */
+  max-width: none;
+  height: 150px;
+  object-fit: cover;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.card-top { display: flex; align-items: flex-start; gap: 1rem; }
+.card-icon-ph {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1.5px solid var(--brown-light);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brown-pastel) 18%, var(--bg-card));
+  color: var(--accent);
+  font: 700 0.72rem var(--font-serif);
+  letter-spacing: 0.02em;
+}
+
+.card-players {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-left: auto;
+  padding: 0.28rem 0.55rem;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--accent);
+  font: 700 0.66rem var(--font-sans);
+  letter-spacing: 0.08em;
+}
+
 .cards-grid {
   display: flex;
   flex-wrap: wrap;
@@ -972,7 +1011,7 @@ body.drawer-open { overflow: hidden; }
   outline: none;
 }
 
-#game-area > * {
+#game-area > :not(.two-player-badge) {
   position: relative;
   width: 100%;
   min-width: 0;
@@ -3091,6 +3130,36 @@ body.drawer-open { overflow: hidden; }
   .game-card.will-enter { opacity: 1; transform: none; }
   .game-card.will-enter.has-entered { opacity: 1; transform: none; transition: none; }
   .game-card, .game-card:hover { transform: none; }
+}
+
+/* ═══ Selo "2 Jogadores" dentro da área dos jogos de duas pessoas ═══ */
+.two-player-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.9rem;
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  background: var(--bg-card);
+  box-shadow: 0 3px 10px rgba(48, 37, 31, 0.25);
+  color: var(--accent);
+  font: 700 0.78rem var(--font-sans);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: badge-in 280ms ease-out both;
+}
+@keyframes badge-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .two-player-badge { animation: none; }
 }
 
 /* ═══════════════════

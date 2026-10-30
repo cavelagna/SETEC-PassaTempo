@@ -247,6 +247,16 @@ function showGame(id) {
     gameArea.innerHTML = '';
     entry.module.mount(gameArea);
 
+    // Selo "2 Jogadores" para jogos de duas pessoas
+    if (TWO_PLAYER_GAMES.has(id) && gameArea) {
+      const badge = document.createElement('div');
+      badge.className = 'two-player-badge';
+      badge.setAttribute('role', 'note');
+      badge.setAttribute('aria-label', 'Este jogo é para 2 jogadores');
+      badge.innerHTML = '<svg width="15" height="15" viewBox="0 0 15 15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="4.6" cy="5" r="2.1"/><path d="M1.5 12.2c0-2 1.4-3.4 3.1-3.4S7.7 10.2 7.7 12.2"/><circle cx="10.4" cy="5" r="2.1"/><path d="M7.3 12.2c0-2 1.4-3.4 3.1-3.4s3.1 1.4 3.1 3.4"/></svg><span>2 Jogadores</span>';
+      gameArea.prepend(badge);
+    }
+
     if (!seenGameRules.has(id)) showGameRules(id);
 
     requestAnimationFrame(() => {
@@ -256,6 +266,9 @@ function showGame(id) {
     });
   });
 }
+
+// Jogos que exigem duas pessoas: exibem o selo "2 Jogadores" dentro da área do jogo
+const TWO_PLAYER_GAMES = new Set(['tictactoe', 'checkers', 'chess']);
 
 function showGameRules(id) {
   const entry = GAMES[id];
