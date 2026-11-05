@@ -386,6 +386,54 @@ const Sudoku = (() => {
     installKeyHandler();
   }
 
+  function getSaveState() {
+    if (!container || isBoardComplete()) return null;
+    return {
+      solution,
+      given,
+      userBoard,
+      selected,
+      difficulty,
+      status: container.querySelector('.sdk-status')?.textContent || '',
+    };
+  }
+
+  function restoreSaveState(saved) {
+    const validGrid = (grid, min, max, allowZero = false) => Array.isArray(grid) && grid.length === 9 &&
+      grid.every(row => Array.isArray(row) && row.length === 9 && row.every(value => Number.isInteger(value) && value >= min && value <= max));
+    if (!saved || !validGrid(saved.solution, 1, 9) || !validGrid(saved.userBoard, 0, 9) ||
+      !Array.isArray(saved.given) || saved.given.length !== 9 ||
+      !saved.given.every(row => Array.isArray(row) && row.length === 9 && row.every(value => typeof value === 'boolean')) ||
+      !Object.hasOwn(DIFF_LABELS, saved.difficulty) || typeof saved.status !== 'string' ||
+      (saved.selected !== null && (!Number.isInteger(saved.selected?.r) || !Number.isInteger(saved.selected?.c) ||
+        saved.selected.r < 0 || saved.selected.r > 8 || saved.selected.c < 0 || saved.selected.c > 8))) return false;
+
+    const validSolution = saved.solution.every((row, r) => new Set(row).size === 9 &&
+      new Set(saved.solution.map(other => other[r])).size === 9) &&
+      [0, 3, 6].every(row => [0, 3, 6].every(column => {
+        const values = [];
+        for (let r = row; r < row + 3; r++) for (let c = column; c < column + 3; c++) values.push(saved.solution[r][c]);
+        return new Set(values).size === 9;
+      }));
+    if (!validSolution) return false;
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
+      if (saved.given[r][c] !== (saved.userBoard[r][c] !== 0 && saved.userBoard[r][c] === saved.solution[r][c]) && saved.given[r][c]) return false;
+      if (saved.given[r][c] && saved.userBoard[r][c] !== saved.solution[r][c]) return false;
+    }
+
+    solution = saved.solution.map(row => [...row]);
+    given = saved.given.map(row => [...row]);
+    userBoard = saved.userBoard.map(row => [...row]);
+    selected = saved.selected ? { ...saved.selected } : null;
+    difficulty = saved.difficulty;
+    buildDOM();
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) refreshCell(r, c);
+    refreshHighlights();
+    setStatus(saved.status);
+    installKeyHandler();
+    return true;
+  }
+
   function unmount() {
     if (keyHandler) {
       document.removeEventListener('keydown', keyHandler);
@@ -395,5 +443,5 @@ const Sudoku = (() => {
     container = null;
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

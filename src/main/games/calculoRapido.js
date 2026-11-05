@@ -2,7 +2,7 @@
 
 const QuickCalc = (() => {
   const ROUND_SECONDS = 90;
-  let container, timerId, state, question, previousQuestion;
+  let container, timerId, advanceTimer, state, question, previousQuestion;
 
   function randomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -45,20 +45,36 @@ const QuickCalc = (() => {
       <div class="math-game-stats"><span>Tempo <strong class="quick-time">${state.time}</strong></span><span>Pontos <strong>${state.score}</strong></span></div>
       <p class="game-eyebrow">Conta ${state.total + 1}</p><div class="math-question">${question.text} = ?</div>
       <form class="math-answer-form"><label class="sr-only" for="quick-answer">Sua resposta</label><input id="quick-answer" class="math-answer" type="number" inputmode="numeric" autocomplete="off" required><button class="game-action-btn math-primary">Confirmar</button></form>
+      <button class="game-action-btn quick-restart" type="button">Novo jogo</button>
       <p class="math-feedback" role="status" aria-live="polite">Digite a resposta e pressione Enter.</p>
     </div>`;
     container.querySelector('.math-answer-form').addEventListener('submit', event => { event.preventDefault(); submit(); });
+    container.querySelector('.quick-restart').addEventListener('click', () => {
+      if (window.confirm('Começar uma nova partida? O progresso atual será descartado.')) start();
+    });
     container.querySelector('.math-answer').focus();
+  }
+
+  function startTimer() {
+    clearInterval(timerId);
+    timerId = setInterval(() => {
+      state.time--;
+      const time = container?.querySelector('.quick-time');
+      if (time) time.textContent = state.time;
+      if (state.time <= 0) finish();
+    }, 1000);
   }
 
   function start() {
     clearInterval(timerId);
+    clearTimeout(advanceTimer);
+    advanceTimer = null;
     state = { time: ROUND_SECONDS, score: 0, correct: 0, wrong: 0, total: 0, locked: false };
     previousQuestion = null;
     question = makeQuestion(0);
     previousQuestion = question;
     renderRound();
-    timerId = setInterval(() => { state.time--; const time = container.querySelector('.quick-time'); if (time) time.textContent = state.time; if (state.time <= 0) finish(); }, 1000);
+    startTimer();
   }
 
   function submit() {
@@ -72,19 +88,38 @@ const QuickCalc = (() => {
     if (correct) { state.correct++; state.score += 10 + Math.max(0, Math.floor(state.time / 10)); feedback.textContent = 'Correto. Próxima conta...'; feedback.dataset.state = 'correct'; }
     else { state.wrong++; feedback.textContent = `Ainda não. A resposta era ${question.answer}.`; feedback.dataset.state = 'wrong'; }
     state.total++;
-    setTimeout(() => { if (!state || state.time <= 0) return; state.locked = false; question = makeQuestion(state.correct); previousQuestion = question; renderRound(); }, 450);
+    advanceTimer = setTimeout(() => { advanceTimer = null; if (!state || state.time <= 0) return; state.locked = false; question = makeQuestion(state.correct); previousQuestion = question; renderRound(); }, 450);
   }
 
   function finish() {
     if (!state) return;
-    clearInterval(timerId); timerId = null; state.time = 0;
+    clearInterval(timerId); clearTimeout(advanceTimer); timerId = null; advanceTimer = null; state.time = 0;
     const record = saveRecord(state.score);
     container.innerHTML = `<div class="math-game math-game--result"><p class="game-eyebrow">Tempo encerrado</p><h3>Resultado</h3><div class="result-score">${state.score} pontos</div><dl class="result-list"><div><dt>Acertos</dt><dd>${state.correct}</dd></div><div><dt>Erros</dt><dd>${state.wrong}</dd></div><div><dt>Total</dt><dd>${state.total}</dd></div><div><dt>Recorde</dt><dd>${record}</dd></div></dl><div class="result-actions"><button class="game-action-btn math-primary quick-again">Jogar novamente</button><button class="game-action-btn quick-home">Voltar aos jogos</button></div></div>`;
     container.querySelector('.quick-again').addEventListener('click', start);
     container.querySelector('.quick-home').addEventListener('click', () => window.dispatchEvent(new CustomEvent('passatempo:home')));
   }
 
+  function getSaveState() {
+    return state && state.time > 0 ? { state: { ...state }, question: { ...question }, previousQuestion: previousQuestion && { ...previousQuestion } } : null;
+  }
+
+  function restoreSaveState(saved) {
+    if (!saved || !saved.state || !Number.isInteger(saved.state.time) || saved.state.time < 1 || saved.state.time > ROUND_SECONDS ||
+      !['score', 'correct', 'wrong', 'total'].every(key => Number.isSafeInteger(saved.state[key]) && saved.state[key] >= 0) ||
+      typeof saved.state.locked !== 'boolean' || !saved.question || typeof saved.question.text !== 'string' || !Number.isFinite(saved.question.answer) ||
+      (saved.previousQuestion && typeof saved.previousQuestion.text !== 'string')) return false;
+    clearInterval(timerId); clearTimeout(advanceTimer);
+    state = { ...saved.state, locked: false };
+    previousQuestion = saved.question;
+    question = saved.state.locked ? makeQuestion(state.correct) : { ...saved.question };
+    previousQuestion = question;
+    renderRound();
+    startTimer();
+    return true;
+  }
+
   function mount(el) { container = el; state = null; renderStart(); }
-  function unmount() { clearInterval(timerId); timerId = null; state = null; question = null; previousQuestion = null; if (container) container.innerHTML = ''; container = null; }
-  return { mount, unmount };
+  function unmount() { clearInterval(timerId); clearTimeout(advanceTimer); timerId = null; advanceTimer = null; state = null; question = null; previousQuestion = null; if (container) container.innerHTML = ''; container = null; }
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

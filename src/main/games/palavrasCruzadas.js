@@ -73,5 +73,37 @@ const Crossword = (() => {
   function start(level) { difficulty = level; words = chooseWords(level); dimensions = { rows: words.length + 1, cols: Math.max(...words.map(item => item.word.length)) + 1 }; selected = null; render(); }
   function mount(el) { container = el; selected = null; container.addEventListener('keydown', handleKey); difficultyScreen(); }
   function unmount() { if (container) container.innerHTML = ''; container = null; cells = null; selected = null; words = null; dimensions = null; }
-  return { mount, unmount };
+
+  function getSaveState() {
+    if (!container || !words || !cells) return null;
+    const answers = cells.map(cell => cell.dataset.value || '');
+    if (words.every(item => [...item.word].every((_, offset) =>
+      answers.find((_, index) => Number(cells[index].dataset.row) === item.row && Number(cells[index].dataset.col) === offset) === item.word[offset]))) return null;
+    return { difficulty, words, dimensions, answers, selected };
+  }
+
+  function restoreSaveState(saved) {
+    if (!saved || !Object.hasOwn(LEVELS, saved.difficulty) || !Array.isArray(saved.words) ||
+      saved.words.length !== LEVELS[saved.difficulty] || !Array.isArray(saved.answers) ||
+      !saved.words.every((item, index) => WORD_POOL.some(([word, clue]) => word === item.word && clue === item.clue) &&
+        item.row === index && item.col === 0 && item.number === index + 1) ||
+      !saved.answers.every(value => value === '' || /^[A-Z]$/.test(value)) ||
+      !saved.dimensions || saved.dimensions.rows !== saved.words.length + 1 ||
+      saved.dimensions.cols !== Math.max(...saved.words.map(item => item.word.length)) + 1) return false;
+
+    difficulty = saved.difficulty;
+    words = saved.words.map(item => ({ ...item }));
+    dimensions = { ...saved.dimensions };
+    selected = saved.selected ? { ...saved.selected } : null;
+    render();
+    cells.forEach((cell, index) => {
+      if (!saved.answers[index]) return;
+      cell.dataset.value = saved.answers[index];
+      cell.querySelector('span').textContent = saved.answers[index];
+    });
+    if (selected) select(selected.row, selected.col);
+    return true;
+  }
+
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

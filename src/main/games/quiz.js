@@ -141,16 +141,22 @@ const Quiz = (() => {
   let secondsLeft = TIME_PER_QUESTION;
   let timer = null;
   let advanceTimer = null;
+  let nextAt = null;
+  let currentOptions = null;
+  let lastAnswer = null;
 
   function clearAdvanceTimer() {
     clearTimeout(advanceTimer);
     advanceTimer = null;
+    nextAt = null;
   }
 
   function scheduleNext(delay) {
     clearAdvanceTimer();
+    nextAt = Date.now() + delay;
     advanceTimer = setTimeout(() => {
       advanceTimer = null;
+      nextAt = null;
       next();
     }, delay);
   }
@@ -181,6 +187,13 @@ const Quiz = (() => {
 
   // ── Telas ─────────────────────────────────────────────────
   function renderIntro() {
+    clearInterval(timer);
+    timer = null;
+    clearAdvanceTimer();
+    level = null;
+    questions = [];
+    currentOptions = null;
+    lastAnswer = null;
     container.innerHTML =
       '<div class="quiz-game">' +
         '<div class="quiz-intro">' +
@@ -209,7 +222,8 @@ const Quiz = (() => {
 
   function renderQuestion() {
     const question = questions[index];
-    const options = shuffledOptions(question);
+    currentOptions = currentOptions || shuffledOptions(question);
+    const options = currentOptions;
     const percent = Math.round((index / questions.length) * 100);
 
     container.innerHTML =
@@ -235,6 +249,7 @@ const Quiz = (() => {
         '<p class="quiz-feedback" role="status" aria-live="polite">Escolha uma alternativa.</p>' +
         '<div class="quiz-actions">' +
           '<button class="game-action-btn quiz-skip" type="button">Pular pergunta</button>' +
+          '<button class="game-action-btn quiz-new" type="button">Nova partida</button>' +
           '<button class="game-action-btn quiz-quit" type="button">Encerrar partida</button>' +
         '</div>' +
       '</div>';
@@ -243,7 +258,11 @@ const Quiz = (() => {
       button.addEventListener('click', () => answer(button));
     });
     container.querySelector('.quiz-skip').addEventListener('click', skip);
+    container.querySelector('.quiz-new').addEventListener('click', () => {
+      if (window.confirm('Começar uma nova partida? O progresso atual será descartado.')) start(level.id);
+    });
     container.querySelector('.quiz-quit').addEventListener('click', () => finish(true));
+    if (answered && lastAnswer) restoreAnswerFeedback();
   }
 
   function renderResult(quit) {
@@ -283,6 +302,8 @@ const Quiz = (() => {
   }
 
   function start(levelId) {
+    clearInterval(timer);
+    clearAdvanceTimer();
     level = LEVELS.find(item => item.id === levelId) || LEVELS[0];
     questions = shuffle(level.bank).slice(0, level.count);
     index = 0;
@@ -291,12 +312,16 @@ const Quiz = (() => {
     wrong = 0;
     streak = 0;
     bestStreak = 0;
+    currentOptions = null;
+    lastAnswer = null;
     showQuestion();
   }
 
   function showQuestion() {
     answered = false;
     secondsLeft = TIME_PER_QUESTION;
+    currentOptions = null;
+    lastAnswer = null;
     renderQuestion();
     startTimer();
   }
@@ -333,6 +358,16 @@ const Quiz = (() => {
     if (right) right.classList.add('is-correct');
   }
 
+  function restoreAnswerFeedback() {
+    lockOptions();
+    if (lastAnswer.kind === 'answer') {
+      const chosen = container.querySelector(`.quiz-option[data-option="${lastAnswer.option}"]`);
+      chosen?.classList.add(lastAnswer.correct ? 'is-correct' : 'is-wrong');
+    }
+    if (!lastAnswer.correct) revealRight();
+    showFeedback(lastAnswer.feedback, lastAnswer.feedbackState);
+  }
+
   function answer(button) {
     if (answered) return;
     answered = true;
@@ -345,11 +380,13 @@ const Quiz = (() => {
       correct += 1;
       streak += 1;
       bestStreak = Math.max(bestStreak, streak);
+      lastAnswer = { kind: 'answer', option: Number(button.dataset.option), correct: true, feedback: 'Correto! +' + gained + ' pontos.', feedbackState: 'correct' };
       button.classList.add('is-correct');
       showFeedback('Correto! +' + gained + ' pontos.', 'correct');
     } else {
       wrong += 1;
       streak = 0;
+      lastAnswer = { kind: 'answer', option: Number(button.dataset.option), correct: false, feedback: 'Resposta incorreta. A alternativa correta está destacada.', feedbackState: 'wrong' };
       button.classList.add('is-wrong');
       revealRight();
       showFeedback('Resposta incorreta. A alternativa correta está destacada.', 'wrong');
@@ -365,6 +402,7 @@ const Quiz = (() => {
     lockOptions();
     wrong += 1;
     streak = 0;
+    lastAnswer = { kind: 'timeout', option: null, correct: false, feedback: 'Tempo esgotado! A alternativa correta está destacada.', feedbackState: 'wrong' };
     revealRight();
     showFeedback('Tempo esgotado! A alternativa correta está destacada.', 'wrong');
     scheduleNext(1900);
@@ -377,6 +415,7 @@ const Quiz = (() => {
     lockOptions();
     wrong += 1;
     streak = 0;
+    lastAnswer = { kind: 'skip', option: null, correct: false, feedback: 'Pergunta pulada.', feedbackState: 'wrong' };
     revealRight();
     showFeedback('Pergunta pulada.', 'wrong');
     scheduleNext(1100);
@@ -414,10 +453,69 @@ const Quiz = (() => {
     questions = [];
   }
 
+  function getSaveState() {
+    if (!container || !level || !questions.length || container.querySelector('.quiz-game--result')) return null;
+    return {
+      level: level.id,
+      questions,
+      index,
+      score,
+      correct,
+      wrong,
+      streak,
+      bestStreak,
+      answered,
+      secondsLeft,
+      currentOptions,
+      lastAnswer,
+      advanceRemaining: nextAt === null ? 0 : Math.max(0, nextAt - Date.now()),
+    };
+  }
+
+  function restoreSaveState(saved) {
+    const restoredLevel = LEVELS.find(item => item.id === saved?.level);
+    if (!saved || !restoredLevel || !Array.isArray(saved.questions) || saved.questions.length !== restoredLevel.count ||
+      !saved.questions.every(question => restoredLevel.bank.some(item => item.q === question.q && JSON.stringify(item.a) === JSON.stringify(question.a))) ||
+      !Number.isInteger(saved.index) || saved.index < 0 || saved.index >= saved.questions.length ||
+      !['score', 'correct', 'wrong', 'streak', 'bestStreak'].every(key => Number.isSafeInteger(saved[key]) && saved[key] >= 0) ||
+      saved.correct + saved.wrong !== saved.index + (saved.answered ? 1 : 0) ||
+      saved.streak > saved.correct || saved.bestStreak < saved.streak ||
+      typeof saved.answered !== 'boolean' || !Number.isInteger(saved.secondsLeft) || saved.secondsLeft < 1 || saved.secondsLeft > TIME_PER_QUESTION ||
+      !Array.isArray(saved.currentOptions) || saved.currentOptions.length !== 4 ||
+      !saved.currentOptions.every(option => saved.questions[saved.index].a.includes(option.text) && typeof option.correct === 'boolean') ||
+      saved.currentOptions.filter(option => option.correct).length !== 1 ||
+      new Set(saved.currentOptions.map(option => option.text)).size !== 4 ||
+      saved.currentOptions.find(option => option.correct)?.text !== saved.questions[saved.index].a[0] ||
+      (saved.answered && (!saved.lastAnswer || !['answer', 'timeout', 'skip'].includes(saved.lastAnswer.kind) ||
+        typeof saved.lastAnswer.feedback !== 'string' || typeof saved.lastAnswer.correct !== 'boolean' ||
+        (saved.lastAnswer.kind === 'answer' && (!Number.isInteger(saved.lastAnswer.option) || saved.lastAnswer.option < 0 || saved.lastAnswer.option > 3)) ||
+        !['correct', 'wrong'].includes(saved.lastAnswer.feedbackState))) ||
+      !Number.isFinite(saved.advanceRemaining) || saved.advanceRemaining < 0) return false;
+
+    clearInterval(timer);
+    clearAdvanceTimer();
+    level = restoredLevel;
+    questions = saved.questions.map(question => ({ q: question.q, a: [...question.a] }));
+    index = saved.index;
+    score = saved.score;
+    correct = saved.correct;
+    wrong = saved.wrong;
+    streak = saved.streak;
+    bestStreak = saved.bestStreak;
+    answered = saved.answered;
+    secondsLeft = saved.secondsLeft;
+    currentOptions = saved.currentOptions.map(option => ({ ...option }));
+    lastAnswer = saved.lastAnswer && { ...saved.lastAnswer };
+    renderQuestion();
+    if (answered) scheduleNext(saved.advanceRemaining);
+    else startTimer();
+    return true;
+  }
+
   // Ponte de testes: tamanho dos bancos de perguntas por nível.
   function bankSizes() {
     return LEVELS.map(level => ({ id: level.id, name: level.name, perRound: level.count, bank: level.bank.length }));
   }
 
-  return { mount, unmount, bankSizes };
+  return { mount, unmount, bankSizes, getSaveState, restoreSaveState };
 })();

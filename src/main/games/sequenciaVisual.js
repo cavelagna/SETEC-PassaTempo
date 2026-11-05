@@ -47,6 +47,7 @@ const VisualSequence = (() => {
   let playing = false;
   let accepting = false;
   let cancelRoundBar = null; // interrompe a barra da rodada em andamento
+  let phaseEndsAt = null;
   const timers = new Set();
 
   // ── Utilidades ───────────────────────────────────────────
@@ -82,6 +83,11 @@ const VisualSequence = (() => {
     }
   }
 
+  function updateStartButton() {
+    const button = container?.querySelector('.vs-start');
+    if (button) button.textContent = playing ? 'Reiniciar jogo' : 'Iniciar jogo';
+  }
+
   function build() {
     container.innerHTML = `
       <section class="vs-game">
@@ -106,7 +112,11 @@ const VisualSequence = (() => {
         </div>
       </section>
     `;
-    container.querySelector('.vs-start').addEventListener('click', startGame);
+    container.querySelector('.vs-start').addEventListener('click', () => {
+      if (playing && !window.confirm('Começar uma nova partida? O progresso atual será descartado.')) return;
+      startGame();
+    });
+    updateStartButton();
     renderStage();
     renderOptions();
     updateHud();
@@ -176,6 +186,7 @@ const VisualSequence = (() => {
 
     playing = true;
     accepting = false;
+    updateStartButton();
     renderStage();
     renderOptions();
     updateHud();
@@ -187,8 +198,12 @@ const VisualSequence = (() => {
   function runTimerBar(total, onTick, onEnd) {
     const bar = container?.querySelector('.vs-think-bar');
     const endsAt = Date.now() + total;
+    phaseEndsAt = endsAt;
     let cancelled = false;
-    const cancel = () => { cancelled = true; };
+    const cancel = () => {
+      cancelled = true;
+      if (phaseEndsAt === endsAt) phaseEndsAt = null;
+    };
     bar?.style.setProperty('--vs-think', '100%');
 
     const tick = () => {
@@ -200,7 +215,11 @@ const VisualSequence = (() => {
       track(setTimeout(tick, COUNTDOWN_TICK_MS));
     };
     tick();
-    track(setTimeout(() => { if (!cancelled) onEnd?.(); }, total));
+    track(setTimeout(() => {
+      if (cancelled) return;
+      if (phaseEndsAt === endsAt) phaseEndsAt = null;
+      onEnd?.();
+    }, total));
     return cancel;
   }
 
@@ -209,7 +228,7 @@ const VisualSequence = (() => {
     cancelRoundBar = null;
   }
 
-  function showSequence() {
+  function showSequence(duration = memorizeMs()) {
     const stage = container.querySelector('.vs-stage');
     clearOptionFeedback();
     // A sequência inteira aparece de uma vez e permanece visível durante
@@ -220,12 +239,12 @@ const VisualSequence = (() => {
     [...stage.querySelectorAll('.vs-step')].forEach(step => step.classList.add('is-showing'));
 
     stopRoundBar();
-    cancelRoundBar = runTimerBar(memorizeMs(), null, startThinking);
+    cancelRoundBar = runTimerBar(duration, null, startThinking);
   }
 
   // A sequência desaparece, a barra reinicia cheia e esvazia durante a vez do
   // jogador. O prazo é o mesmo da memorização; estourar custa vida.
-  function startThinking() {
+  function startThinking(duration = thinkMs()) {
     const stage = container.querySelector('.vs-stage');
     [...stage.querySelectorAll('.vs-step')].forEach(step => step.classList.remove('is-showing'));
     stage.classList.add('is-hidden');
@@ -233,7 +252,7 @@ const VisualSequence = (() => {
     // Sem espera: a resposta é liberada imediatamente, junto com o cronômetro.
     accepting = true;
     stopRoundBar();
-    cancelRoundBar = runTimerBar(thinkMs(), left => {
+    cancelRoundBar = runTimerBar(duration, left => {
       setStatus(`Repita a sequência! ${Math.ceil(left / 1000)}s`);
     }, timeUp);
   }
@@ -280,6 +299,7 @@ const VisualSequence = (() => {
       if (lives <= 0) {
         setStatus('Fim de jogo! Clique em “Iniciar jogo” para tentar novamente.');
         playing = false;
+        updateStartButton();
         window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'loss' } }));
         return;
       }
@@ -297,6 +317,7 @@ const VisualSequence = (() => {
     if (lives <= 0) {
       setStatus('Fim de jogo! Clique em “Iniciar jogo” para tentar novamente.');
       playing = false;
+      updateStartButton();
       window.dispatchEvent(new CustomEvent('passatempo:result', { detail: { result: 'loss' } }));
       return;
     }
@@ -324,14 +345,57 @@ const VisualSequence = (() => {
     container.addEventListener('click', onClick);
   }
 
+  function getSaveState() {
+    if (!container || !playing || !order.length) return null;
+    return {
+      order: [...order],
+      options: [...options],
+      picked: [...picked],
+      level,
+      lives,
+      accepting,
+      phaseRemaining: phaseEndsAt === null ? 0 : Math.max(0, phaseEndsAt - Date.now()),
+    };
+  }
+
+  function restoreSaveState(saved) {
+    const validIds = values => Array.isArray(values) && values.every(id => ITEMS.some(item => item.id === id));
+    if (!saved || !validIds(saved.order) || !saved.order.length || new Set(saved.order).size !== saved.order.length ||
+      saved.level !== saved.order.length || !validIds(saved.options) || saved.options.length !== saved.order.length ||
+      saved.order.some(id => !saved.options.includes(id)) || !validIds(saved.picked) ||
+      saved.picked.length > saved.order.length || saved.picked.some((id, index) => id !== saved.order[index]) ||
+      !Number.isInteger(saved.lives) || saved.lives < 1 || saved.lives > MAX_LIVES ||
+      typeof saved.accepting !== 'boolean' || !Number.isFinite(saved.phaseRemaining) || saved.phaseRemaining < 0) return false;
+
+    clearTimers();
+    stopRoundBar();
+    order = [...saved.order];
+    options = [...saved.options];
+    picked = [...saved.picked];
+    level = saved.level;
+    lives = saved.lives;
+    playing = true;
+    accepting = saved.accepting;
+    build();
+    renderStage();
+    renderOptions();
+    updateHud();
+    picked.forEach(markOptionUsed);
+    if (accepting) startThinking(saved.phaseRemaining > 0 ? saved.phaseRemaining : thinkMs());
+    else if (picked.length === order.length) nextRound();
+    else showSequence(saved.phaseRemaining > 0 ? saved.phaseRemaining : memorizeMs());
+    return true;
+  }
+
   function unmount() {
     if (container) {
       container.removeEventListener('click', onClick);
       container.innerHTML = '';
     }
     container = null;
+    stopRoundBar();
     clearTimers();
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

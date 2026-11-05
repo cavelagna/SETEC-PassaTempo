@@ -582,6 +582,49 @@ const Chess = (() => {
     render();
   }
 
+  function getSaveState() {
+    if (!container || !state || state.result) return null;
+    return {
+      state,
+      selected,
+      pendingPromotion,
+      repetition: [...repetition],
+      undoStack,
+    };
+  }
+
+  function restoreSaveState(saved) {
+    const validMove = move => move && Number.isInteger(move.from) && move.from >= 0 && move.from < 64 &&
+      Number.isInteger(move.to) && move.to >= 0 && move.to < 64 && /^[pnbrqk]$/.test(move.piece);
+    const validPosition = value => value && Array.isArray(value.board) && value.board.length === 64 &&
+      value.board.every(piece => piece === null || (piece && /^[pnbrqk]$/.test(piece.t) && /^[wb]$/.test(piece.c))) &&
+      /^[wb]$/.test(value.turn) && value.castling && ['K', 'Q', 'k', 'q'].every(flag => typeof value.castling[flag] === 'boolean') &&
+      (value.ep === null || (Number.isInteger(value.ep) && value.ep >= 0 && value.ep < 64)) &&
+      Number.isInteger(value.halfmove) && value.halfmove >= 0 && Number.isInteger(value.fullmove) && value.fullmove > 0 &&
+      value.captured && Array.isArray(value.captured.w) && Array.isArray(value.captured.b) &&
+      [...value.captured.w, ...value.captured.b].every(piece => /^[pnbrqk]$/.test(piece)) &&
+      Array.isArray(value.history) && value.history.every(move => move && typeof move.san === 'string' &&
+        Number.isInteger(move.from) && move.from >= 0 && move.from < 64 && Number.isInteger(move.to) && move.to >= 0 && move.to < 64) &&
+      value.result === null;
+    const validUndo = item => validPosition({ ...item, result: null }) && typeof item.signature === 'string';
+    const validPromotion = !!saved && (saved.pendingPromotion === null ||
+      (saved.pendingPromotion && validMove(saved.pendingPromotion.move) && saved.pendingPromotion.move.promotion === true));
+    if (!saved || !validPosition(saved.state) || !Array.isArray(saved.repetition) ||
+      !saved.repetition.every(entry => Array.isArray(entry) && typeof entry[0] === 'string' && Number.isInteger(entry[1]) && entry[1] > 0) ||
+      !Array.isArray(saved.undoStack) || !saved.undoStack.every(validUndo) || !validPromotion ||
+      !Number.isInteger(saved.selected) || saved.selected < -1 || saved.selected >= 64) return false;
+
+    state = saved.state;
+    undoStack.splice(0, undoStack.length, ...saved.undoStack);
+    repetition = new Map(saved.repetition);
+    pendingPromotion = saved.pendingPromotion || null;
+    selected = Number.isInteger(saved.selected) ? saved.selected : -1;
+    targets = selected >= 0 ? legalMoves(state, state.turn).filter(move => move.from === selected) : [];
+    path = selected >= 0 ? buildPath(selected, targets) : new Set();
+    render();
+    return true;
+  }
+
   // ── Eventos ───────────────────────────────────────────────
   function handleClick(event) {
     const promotion = event.target.closest('[data-promotion]');
@@ -671,5 +714,5 @@ const Chess = (() => {
     undoStack.length = 0;
   }
 
-  return { mount, unmount, setPosition };
+  return { mount, unmount, setPosition, getSaveState, restoreSaveState };
 })();

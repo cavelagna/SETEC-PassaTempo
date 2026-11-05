@@ -140,6 +140,8 @@ const Simon = (() => {
       startBtn.disabled = state === 'playing' || state === 'input';
       startBtn.textContent = state === 'over' ? 'Jogar de novo' : (level > 0 ? 'Recomeçar' : 'Iniciar jogo');
     }
+    const newGameButton = container?.querySelector('.sim-new');
+    if (newGameButton) newGameButton.hidden = state !== 'playing' && state !== 'input';
     const padsDisabled = state !== 'input';
     padEls?.forEach(pad => { pad.setAttribute('aria-disabled', String(padsDisabled)); });
     container?.classList.toggle('is-locked', state !== 'input');
@@ -178,6 +180,7 @@ const Simon = (() => {
 
         <div class="sim-actions">
           <button type="button" class="game-action-btn sim-start">Iniciar jogo</button>
+          <button type="button" class="game-action-btn sim-new" hidden>Nova partida</button>
         </div>
         <p class="sim-hint">Use o mouse, o toque ou as teclas <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd>.</p>
       </section>
@@ -190,6 +193,9 @@ const Simon = (() => {
       pad.addEventListener('click', () => handlePad(Number(pad.dataset.pad)));
     });
     container.querySelector('.sim-start').addEventListener('click', startRound);
+    container.querySelector('.sim-new').addEventListener('click', () => {
+      if (window.confirm('Começar uma nova partida? O progresso atual será descartado.')) startRound();
+    });
 
     setControls();
     updateHud();
@@ -307,6 +313,40 @@ const Simon = (() => {
     document.addEventListener('keydown', onKeyDown);
   }
 
+  function getSaveState() {
+    return container && level > 0 && state !== 'over'
+      ? { sequence: [...sequence], inputIndex, state, level, best }
+      : null;
+  }
+
+  function restoreSaveState(saved) {
+    if (!saved || !Array.isArray(saved.sequence) || !saved.sequence.length ||
+      !saved.sequence.every(index => Number.isInteger(index) && index >= 0 && index < PADS.length) ||
+      !Number.isInteger(saved.level) || saved.level !== saved.sequence.length ||
+      !Number.isInteger(saved.inputIndex) || saved.inputIndex < 0 || saved.inputIndex > saved.sequence.length ||
+      !['playing', 'input', 'idle'].includes(saved.state) || !Number.isInteger(saved.best) || saved.best < 0) return false;
+    clearAllTimers();
+    clearPadStates();
+    sequence = [...saved.sequence];
+    level = saved.level;
+    best = Math.max(best, saved.best);
+    inputIndex = saved.inputIndex;
+    if (saved.state === 'playing') {
+      inputIndex = 0;
+      playSequence();
+    } else if (saved.state === 'input') {
+      state = 'input';
+      setControls();
+      updateHud();
+      renderProgress();
+      setStatus('Sua vez! Repita a sequência na ordem.');
+    } else {
+      state = 'idle';
+      nextRound();
+    }
+    return true;
+  }
+
   function unmount() {
     document.removeEventListener('keydown', onKeyDown);
     clearAllTimers();
@@ -316,5 +356,5 @@ const Simon = (() => {
     padEls = null;
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

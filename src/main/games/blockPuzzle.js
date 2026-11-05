@@ -435,6 +435,54 @@ const BlockPuzzle = (() => {
     document.addEventListener('keydown', onKey);
   }
 
+  function getSaveState() {
+    if (!container || gameOver || !current) return null;
+    return {
+      board,
+      bag,
+      current,
+      next,
+      hold,
+      canHold,
+      score,
+      lines,
+      level,
+      paused,
+      lastMessage,
+    };
+  }
+
+  function restoreSaveState(saved) {
+    const validPiece = piece => piece && Object.hasOwn(SHAPES, piece.key) && Array.isArray(piece.matrix) &&
+      piece.matrix.length > 0 && piece.matrix.every(row => Array.isArray(row) && row.length > 0 && row.every(cell => cell === 0 || cell === 1)) &&
+      Number.isInteger(piece.x) && Number.isInteger(piece.y);
+    if (!saved || !Array.isArray(saved.board) || saved.board.length !== ROWS + HIDDEN_ROWS ||
+      !saved.board.every(row => Array.isArray(row) && row.length === COLS && row.every(cell => Number.isInteger(cell) && cell >= EMPTY && cell <= 7)) ||
+      !Array.isArray(saved.bag) || !saved.bag.every(key => Object.hasOwn(SHAPES, key)) ||
+      !validPiece(saved.current) || (saved.next !== null && !Object.hasOwn(SHAPES, saved.next)) ||
+      (saved.hold !== null && !Object.hasOwn(SHAPES, saved.hold)) || typeof saved.canHold !== 'boolean' ||
+      !Number.isSafeInteger(saved.score) || saved.score < 0 || !Number.isSafeInteger(saved.lines) || saved.lines < 0 ||
+      !Number.isSafeInteger(saved.level) || saved.level < 1 || typeof saved.paused !== 'boolean' || typeof saved.lastMessage !== 'string') return false;
+
+    clearInterval(dropTimer);
+    board = saved.board.map(row => [...row]);
+    bag = [...saved.bag];
+    current = { ...saved.current, matrix: saved.current.matrix.map(row => [...row]) };
+    next = saved.next;
+    hold = saved.hold;
+    canHold = saved.canHold;
+    score = saved.score;
+    lines = saved.lines;
+    level = saved.level;
+    paused = saved.paused;
+    gameOver = false;
+    lastMessage = saved.lastMessage;
+    if (collides(current, 0, 0)) return false;
+    render();
+    resetDropTimer();
+    return true;
+  }
+
   function unmount() {
     clearInterval(dropTimer);
     dropTimer = null;
@@ -452,5 +500,5 @@ const BlockPuzzle = (() => {
     board = [];
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

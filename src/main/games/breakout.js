@@ -254,6 +254,49 @@ const Breakout = (() => {
     frameId = requestAnimationFrame(loop);
   }
 
+  function getSaveState() {
+    if (!container || ended) return null;
+    return {
+      paddleX,
+      ball: { ...ball },
+      bricks: bricks.map(brick => brick.alive),
+      score,
+      lives,
+      paused,
+    };
+  }
+
+  function restoreSaveState(saved) {
+    if (!saved || !Number.isFinite(saved.paddleX) || saved.paddleX < 0 || saved.paddleX > WIDTH - PADDLE_WIDTH ||
+      !saved.ball || !Number.isFinite(saved.ball.x) || !Number.isFinite(saved.ball.y) ||
+      !Number.isFinite(saved.ball.vx) || !Number.isFinite(saved.ball.vy) ||
+      saved.ball.x < BALL_RADIUS || saved.ball.x > WIDTH - BALL_RADIUS ||
+      saved.ball.y < BALL_RADIUS || saved.ball.y > HEIGHT + BALL_RADIUS ||
+      !Array.isArray(saved.bricks) || saved.bricks.length !== BRICK_ROWS * BRICK_COLUMNS ||
+      !saved.bricks.every(alive => typeof alive === 'boolean') || !saved.bricks.some(Boolean) ||
+      !Number.isSafeInteger(saved.score) || saved.score < 0 || !Number.isInteger(saved.lives) || saved.lives < 1 || saved.lives > 3 ||
+      typeof saved.paused !== 'boolean') return false;
+
+    cancelAnimationFrame(frameId);
+    paddleX = saved.paddleX;
+    ball = { ...saved.ball };
+    let index = 0;
+    for (let row = 0; row < BRICK_ROWS; row++) for (let column = 0; column < BRICK_COLUMNS; column++) {
+      bricks[index++].alive = saved.bricks[row * BRICK_COLUMNS + column];
+    }
+    score = saved.score;
+    lives = saved.lives;
+    paused = saved.paused;
+    ended = false;
+    lastFrame = 0;
+    pauseButton.textContent = paused ? 'Continuar' : 'Pausar';
+    updateHud();
+    setStatus(paused ? 'Partida pausada.' : 'Partida em andamento.');
+    draw();
+    frameId = requestAnimationFrame(loop);
+    return true;
+  }
+
   function unmount() {
     cancelAnimationFrame(frameId);
     canvas?.removeEventListener('pointermove', handlePointerMove);
@@ -272,5 +315,5 @@ const Breakout = (() => {
     keys.clear();
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

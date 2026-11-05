@@ -67,6 +67,21 @@ const TicTacToe = (() => {
     updateView();
   }
 
+  function getSaveState() {
+    return container && !gameOver ? { board: [...board], player } : null;
+  }
+
+  function restoreSaveState(saved) {
+    if (!saved || !Array.isArray(saved.board) || saved.board.length !== 9 ||
+      !saved.board.every(cell => cell === '' || cell === 'X' || cell === 'O') ||
+      !['X', 'O'].includes(saved.player) || checkResult(saved.board)) return false;
+    board = [...saved.board];
+    player = saved.player;
+    gameOver = false;
+    updateView();
+    return true;
+  }
+
   function mount(el) {
     container = el;
 
@@ -104,5 +119,5 @@ const TicTacToe = (() => {
     container = null;
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

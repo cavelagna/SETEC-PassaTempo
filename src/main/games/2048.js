@@ -213,6 +213,39 @@ const TwoThousandFortyEight = (() => {
     render();
   }
 
+  function getSaveState() {
+    if (!board || !['playing', 'won'].includes(phase)) return null;
+    return {
+      board: board.map(row => [...row]),
+      score,
+      phase,
+      targetReached,
+    };
+  }
+
+  function restoreSaveState(saved) {
+    if (!saved || !Array.isArray(saved.board) || saved.board.length !== SIZE ||
+      !saved.board.every(row => Array.isArray(row) && row.length === SIZE && row.every(value =>
+        Number.isSafeInteger(value) && value >= 0 && (value === 0 || Number.isInteger(Math.log2(value))))) ||
+      !Number.isSafeInteger(saved.score) || saved.score < 0 ||
+      !['playing', 'won'].includes(saved.phase) || typeof saved.targetReached !== 'boolean') return false;
+
+    const containsTarget = saved.board.some(row => row.includes(TARGET));
+    if (saved.targetReached !== containsTarget || (saved.phase === 'won' && !containsTarget)) return false;
+
+    board = saved.board.map(row => [...row]);
+    score = saved.score;
+    phase = saved.phase;
+    targetReached = saved.targetReached;
+    bestScore = Math.max(readBestScore(), score);
+    if (phase === 'playing' && !canMove()) return false;
+    setStatus(phase === 'won'
+      ? 'Você chegou ao 2048! Continue jogando ou comece uma nova partida.'
+      : 'Jogo em andamento.');
+    render();
+    return true;
+  }
+
   function restart() {
     init();
     render();
@@ -444,5 +477,5 @@ const TwoThousandFortyEight = (() => {
     container = null;
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

@@ -123,6 +123,7 @@ const Minesweeper = (() => {
   }
 
   function startTimer() {
+    clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       seconds++;
       const el = container?.querySelector('.ms-timer');
@@ -322,6 +323,62 @@ const Minesweeper = (() => {
     difficultyScreen();
   }
 
+  function getSaveState() {
+    if (!container || !grid || !['idle', 'playing'].includes(gameState)) return null;
+    return {
+      currentDiff,
+      gameState,
+      firstClick,
+      seconds,
+      flagMode,
+      grid: grid.map(row => row.map(cell => ({ ...cell }))),
+    };
+  }
+
+  function restoreSaveState(saved) {
+    const config = CONFIGS[saved?.currentDiff];
+    if (!config || !Array.isArray(saved.grid) || saved.grid.length !== config.rows ||
+      !saved.grid.every((row, r) => Array.isArray(row) && row.length === config.cols && row.every((cell, c) =>
+        cell && cell.r === r && cell.c === c && typeof cell.mine === 'boolean' &&
+        typeof cell.revealed === 'boolean' && typeof cell.flagged === 'boolean' &&
+        Number.isInteger(cell.adjacent) && cell.adjacent >= 0 && cell.adjacent <= 8)) ||
+      !['idle', 'playing'].includes(saved.gameState) || typeof saved.firstClick !== 'boolean' ||
+      !Number.isSafeInteger(saved.seconds) || saved.seconds < 0 || typeof saved.flagMode !== 'boolean') return false;
+
+    const mineTotal = saved.grid.flat().filter(cell => cell.mine).length;
+    const flaggedTotal = saved.grid.flat().filter(cell => cell.flagged).length;
+    if ((saved.firstClick && (mineTotal || saved.gameState !== 'idle')) ||
+      (!saved.firstClick && mineTotal !== config.mines) ||
+      (saved.gameState === 'idle' && (!saved.firstClick || saved.seconds !== 0 || saved.grid.flat().some(cell => cell.revealed))) ||
+      (saved.gameState === 'playing' && (saved.firstClick || saved.seconds < 0)) ||
+      (saved.grid.flat().some(cell => cell.mine && cell.adjacent !== 0)) ||
+      (saved.grid.flat().some(cell => !cell.mine && cell.adjacent !== neighborsFrom(saved.grid, cell.r, cell.c).filter(item => item.mine).length)) ||
+      (saved.grid.flat().some(cell => cell.revealed && (cell.flagged || cell.mine))) ||
+      flaggedTotal > config.rows * config.cols) return false;
+
+    init(saved.currentDiff);
+    grid = saved.grid.map(row => row.map(cell => ({ ...cell })));
+    gameState = saved.gameState;
+    firstClick = saved.firstClick;
+    seconds = saved.seconds;
+    flagged = flaggedTotal;
+    revealed = grid.flat().filter(cell => cell.revealed).length;
+    flagMode = saved.flagMode;
+    buildDOM();
+    if (gameState === 'playing') startTimer();
+    return true;
+  }
+
+  function neighborsFrom(source, r, c) {
+    const result = [];
+    for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+      const nr = r + dr, nc = c + dc;
+      if (source[nr]?.[nc]) result.push(source[nr][nc]);
+    }
+    return result;
+  }
+
   function unmount() {
     clearInterval(timerInterval);
     timerInterval = null;
@@ -329,5 +386,5 @@ const Minesweeper = (() => {
     container = null;
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

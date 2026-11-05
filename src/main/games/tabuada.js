@@ -17,18 +17,21 @@ const TimesTable = (() => {
     container.querySelector('.times-start').addEventListener('click', () => start(container.querySelector('#times-table-choice').value, Number(container.querySelector('#times-difficulty').value)));
   }
 
-  function renderRound() {
-    container.innerHTML = `<div class="math-game"><div class="math-game-stats"><span>Progresso <strong>${state.index + 1}/${state.total}</strong></span><span>Tempo <strong class="times-time">${QUESTION_SECONDS}s</strong></span><span>Pontos <strong>${state.score}</strong></span></div><p class="game-eyebrow">${state.table === 'random' ? 'Tabuada aleatória' : `Tabuada do ${state.table}`}</p><div class="math-question">${question.table} × ${question.multiplier} = ?</div><form class="math-answer-form"><label class="sr-only" for="times-answer">Sua resposta</label><input id="times-answer" class="math-answer" type="number" inputmode="numeric" required autocomplete="off"><button class="game-action-btn math-primary">Confirmar</button></form><p class="math-feedback" role="status" aria-live="polite">Responda para continuar.</p></div>`;
+  function renderRound(resetTimer = true) {
+    container.innerHTML = `<div class="math-game"><div class="math-game-stats"><span>Progresso <strong>${state.index + 1}/${state.total}</strong></span><span>Tempo <strong class="times-time">${state.seconds}s</strong></span><span>Pontos <strong>${state.score}</strong></span></div><p class="game-eyebrow">${state.table === 'random' ? 'Tabuada aleatória' : `Tabuada do ${state.table}`}</p><div class="math-question">${question.table} × ${question.multiplier} = ?</div><form class="math-answer-form"><label class="sr-only" for="times-answer">Sua resposta</label><input id="times-answer" class="math-answer" type="number" inputmode="numeric" required autocomplete="off"><button class="game-action-btn math-primary">Confirmar</button></form><button class="game-action-btn times-restart" type="button">Novo jogo</button><p class="math-feedback" role="status" aria-live="polite">Responda para continuar.</p></div>`;
     container.querySelector('.math-answer-form').addEventListener('submit', e => { e.preventDefault(); submit(); });
     container.querySelector('.math-answer').focus();
-    startQuestionTimer();
+    if (resetTimer) startQuestionTimer();
+    container.querySelector('.times-restart').addEventListener('click', () => {
+      if (window.confirm('Começar uma nova partida? O progresso atual será descartado.')) start(state.table, state.total);
+    });
   }
 
   function start(table, total = 20) { clearInterval(questionTimer); clearTimeout(advanceTimer); advanceTimer = null; state = { table, total, index: 0, score: 0, correct: 0, wrong: 0, last: null, locked: false, seconds: QUESTION_SECONDS }; question = pickQuestion(); renderRound(); }
 
-  function startQuestionTimer() {
+  function startQuestionTimer(reset = true) {
     clearInterval(questionTimer);
-    state.seconds = QUESTION_SECONDS;
+    if (reset) state.seconds = QUESTION_SECONDS;
     questionTimer = setInterval(() => {
       if (!state || state.locked) return;
       state.seconds--;
@@ -39,6 +42,7 @@ const TimesTable = (() => {
   }
 
   function advance() {
+    advanceTimer = null;
     state.index++;
     if (state.index >= state.total) finish();
     else { state.locked = false; question = pickQuestion(); renderRound(); }
@@ -78,5 +82,35 @@ const TimesTable = (() => {
 
   function mount(el) { container = el; renderStart(); }
   function unmount() { clearInterval(questionTimer); clearTimeout(advanceTimer); questionTimer = null; advanceTimer = null; state = null; question = null; if (container) container.innerHTML = ''; container = null; }
-  return { mount, unmount };
+
+  function getSaveState() {
+    return state && !container?.querySelector('.math-game--result')
+      ? { state: { ...state, last: state.last && { ...state.last } }, question: question && { ...question } }
+      : null;
+  }
+
+  function restoreSaveState(saved) {
+    const tableValid = saved?.state?.table === 'random' || Number.isInteger(Number(saved?.state?.table)) && Number(saved.state.table) >= 2 && Number(saved.state.table) <= 10;
+    if (!saved || !saved.state || !tableValid || ![10, 20, 30].includes(saved.state.total) ||
+      !Number.isInteger(saved.state.index) || saved.state.index < 0 || saved.state.index >= saved.state.total ||
+      !['score', 'correct', 'wrong'].every(key => Number.isSafeInteger(saved.state[key]) && saved.state[key] >= 0) ||
+      !Number.isInteger(saved.state.seconds) || saved.state.seconds < 1 || saved.state.seconds > QUESTION_SECONDS ||
+      typeof saved.state.locked !== 'boolean' || !saved.question ||
+      !Number.isInteger(saved.question.table) || saved.question.table < 2 || saved.question.table > 10 ||
+      !Number.isInteger(saved.question.multiplier) || saved.question.multiplier < 1 || saved.question.multiplier > 10 ||
+      saved.question.answer !== saved.question.table * saved.question.multiplier) return false;
+    clearInterval(questionTimer); clearTimeout(advanceTimer);
+    state = { ...saved.state, last: saved.state.last && { ...saved.state.last } };
+    question = { ...saved.question };
+    if (state.locked) {
+      state.locked = false;
+      advance();
+      return true;
+    }
+    renderRound(false);
+    startQuestionTimer(false);
+    return true;
+  }
+
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

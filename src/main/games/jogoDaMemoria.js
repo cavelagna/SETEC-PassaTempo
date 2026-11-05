@@ -188,6 +188,60 @@ const Memory = (() => {
     buildDOM();
   }
 
+  function getSaveState() {
+    if (!container || !cards || matched === cards.length) return null;
+    const savedCards = cards.map(card => ({
+      pair: PAIRS.findIndex(pair => pair.name === card.name),
+      flipped: card.flipped,
+      matched: card.matched,
+    }));
+    const savedFlipped = lockBoard
+      ? flipped.filter(card => card.matched).map(card => card.id)
+      : flipped.map(card => card.id);
+    if (lockBoard && flipped.length === 2 && !flipped[0].matched) {
+      savedCards[flipped[0].id].flipped = false;
+      savedCards[flipped[1].id].flipped = false;
+    }
+    return { cards: savedCards, flipped: savedFlipped, matched, moves, seconds, started: !!timerInterval };
+  }
+
+  function restoreSaveState(saved) {
+    if (!saved || !Array.isArray(saved.cards) || saved.cards.length !== PAIRS.length * 2 ||
+      !saved.cards.every(card => Number.isInteger(card.pair) && card.pair >= 0 && card.pair < PAIRS.length &&
+        typeof card.flipped === 'boolean' && typeof card.matched === 'boolean') ||
+      !Array.isArray(saved.flipped) || saved.flipped.length > 1 ||
+      !saved.flipped.every(id => Number.isInteger(id) && id >= 0 && id < saved.cards.length) ||
+      !Number.isInteger(saved.matched) || saved.matched < 0 || saved.matched >= saved.cards.length || saved.matched % 2 !== 0 ||
+      !Number.isSafeInteger(saved.moves) || saved.moves < 0 || !Number.isSafeInteger(saved.seconds) || saved.seconds < 0 ||
+      typeof saved.started !== 'boolean') return false;
+
+    if (PAIRS.some((_, pairIndex) => saved.cards.filter(card => card.pair === pairIndex).length !== 2) ||
+      saved.cards.filter(card => card.matched).length !== saved.matched ||
+      saved.flipped.some(id => !saved.cards[id].flipped || saved.cards[id].matched)) return false;
+
+    clearInterval(timerInterval);
+    timerInterval = null;
+    cards = saved.cards.map((card, id) => ({
+      id,
+      sym: PAIRS[card.pair].sym,
+      name: PAIRS[card.pair].name,
+      flipped: card.flipped,
+      matched: card.matched,
+    }));
+    flipped = saved.flipped.map(id => cards[id]);
+    matched = saved.matched;
+    lockBoard = false;
+    moves = saved.moves;
+    seconds = saved.seconds;
+    buildDOM();
+    cards.forEach(card => refreshCard(card.id));
+    updateStats();
+    const time = container.querySelector('#mem-time');
+    if (time) time.textContent = `Tempo: ${formatTime(seconds)}`;
+    if (saved.started) startTimer();
+    return true;
+  }
+
   // ── Interface pública ─────────────────────────────────────
 
   function mount(el) {
@@ -203,5 +257,5 @@ const Memory = (() => {
     container = null;
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

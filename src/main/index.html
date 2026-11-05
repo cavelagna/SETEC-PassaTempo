@@ -135,16 +135,22 @@
     <div id="view-home" class="view">
 
       <header class="site-header">
-        <div class="site-title-mark-wrap">
-          <img class="site-title-mark" src="img/outros/logo.png" alt="Logo do Colégio Estadual Barbosa Ferraz">
+        <div class="site-header-inner">
+          <div class="site-header-seal">
+            <div class="site-title-mark-wrap">
+              <img class="site-title-mark" src="img/outros/logo.png" alt="Logo do Colégio Estadual Barbosa Ferraz">
+            </div>
+            <p class="site-header-school">Colégio Estadual<br><strong>Barbosa Ferraz</strong></p>
+          </div>
+          <div class="site-header-copy">
+            <p class="site-kicker">Um clube de jogos clássicos</p>
+            <h1 class="site-title">Passa<span class="site-title-accent">Tempo</span></h1>
+            <p class="site-subtitle">
+              Coleção de jogos clássicos, jogue, pense, e simplesmente deixe o tempo passar...
+            </p>
+            <p class="site-byline"><span>Desenvolvido por</span><strong>Giovanni Cavelagna | 2° Des. Sistemas</strong></p>
+          </div>
         </div>
-        <h1 class="site-title">PassaTempo</h1>
-        <p class="site-subtitle">
-          Coleção de jogos clássicos, jogue, pense, e simplesmente deixe o tempo passar...
-        </p>
-        <p class="site-subtitle">
-          <b>Feito por: Giovanni Cavelagna | 2° Des. Sistemas</b>
-        </p>
       </header>
 
       <!-- Busca em tempo real -->
@@ -163,6 +169,24 @@
 
       <!-- Mensagem quando busca não encontra nada -->
       <p class="search-empty" id="search-empty" hidden aria-live="polite" role="status"></p>
+
+      <section class="continue-section" id="continue-section" aria-labelledby="continue-title">
+        <div class="continue-heading">
+          <div>
+            <p class="continue-kicker">Sua estante</p>
+            <h2 id="continue-title">Continue de onde parou</h2>
+          </div>
+          <span class="continue-mark" aria-hidden="true">PT · 01</span>
+        </div>
+        <div class="continue-empty" id="continue-empty">
+          <div>
+            <p class="continue-empty-title">Seu próximo jogo favorito pode estar aqui!</p>
+            <p class="continue-empty-copy">Escolha um clássico e ele ficará à mão na sua próxima visita.</p>
+          </div>
+          <button class="continue-explore" id="continue-explore" type="button">Explorar jogos</button>
+        </div>
+        <div class="recent-games-grid" id="recent-games-list" hidden></div>
+      </section>
 
       <!-- Catálogo de jogos por categoria -->
       <div class="catalog" id="catalog">
@@ -191,8 +215,8 @@
             </article>
 
             <article class="game-card" data-game="two048" data-tags="2048 logica numeros blocos">
-              <img class="card-image" src="img/jogos/2048.png" alt="Sudoku" loading="lazy">
-              <div class="card-top"><div class="card-icon-ph" aria-hidden="true">2048</div><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">2048</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <img class="card-image" src="img/jogos/2048.png" alt="2048" loading="lazy">
+              <div class="card-top"><div class="card-icon-ph" aria-hidden="true"></div><div class="card-info"><span class="card-category">Lógica</span><h3 class="card-title">2048</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
               <p class="card-desc">Una números iguais e alcance a peça 2048.</p><button class="card-btn" data-game="two048" aria-label="Jogar 2048">Jogar</button>
             </article>
           </div>
@@ -204,9 +228,9 @@
           <div class="cards-grid">
 
             <article class="game-card" data-game="memory" data-tags="memoria jogo da memoria pares cartas concentracao">
-              <img class="card-image" src="img/jogos/JogoDaMemoria.png" alt="Simon" loading="lazy">
+              <img class="card-image" src="img/jogos/JogoDaMemoria.png" alt="Jogo da Memória" loading="lazy">
               <div class="card-top">
-                <div class="card-icon-ph" aria-hidden="true">🃏</div>
+                <div class="card-icon-ph" aria-hidden="true"></div>
                 <div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Jogo da Memória</h3><span class="card-meta">Dificuldade: Fácil</span></div>
               </div>
               <p class="card-desc">Encontre os pares virando duas cartas por vez.</p>
@@ -214,8 +238,8 @@
             </article>
             
             <article class="game-card" data-game="visualseq" data-tags="sequencia visual memoria ordem figuras imagens padrao">
-              <img class="card-image" src="img/jogos/SequenciaVisual.png" alt="Simon" loading="lazy">
-              <div class="card-top"><div class="card-icon-ph" aria-hidden="true">👁</div><div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Sequência Visual</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
+              <img class="card-image" src="img/jogos/SequenciaVisual.png" alt="Sequência Visual" loading="lazy">
+              <div class="card-top"><div class="card-icon-ph" aria-hidden="true"></div><div class="card-info"><span class="card-category">Memória</span><h3 class="card-title">Sequência Visual</h3><span class="card-meta">Dificuldade: Médio</span></div></div>
               <p class="card-desc">Memorize a ordem das figuras e repita a sequência.</p><button class="card-btn" data-game="visualseq" aria-label="Jogar Sequência Visual">Jogar</button>
             </article>
             <article class="game-card" data-game="simon" data-tags="simon memoria sequencia sons cores luz">
@@ -233,9 +257,9 @@
           <div class="cards-grid">
 
             <article class="game-card" data-game="tictactoe" data-tags="jogo da velha tic tac toe xo classico dois jogadores">
-              <img class="card-image" src="img/jogos/JogoDaVelha.png" alt="Snake" loading="lazy">
+              <img class="card-image" src="img/jogos/JogoDaVelha.png" alt="Jogo da Velha" loading="lazy">
               <div class="card-top">
-                <div class="card-icon-ph" aria-hidden="true">⭘</div>
+                <div class="card-icon-ph" aria-hidden="true"></div>
                 <div class="card-info"><span class="card-category">Clássicos · 2 Jogadores</span><h3 class="card-title">Jogo da Velha</h3><span class="card-meta">Dificuldade: Fácil</span></div>
                 <span class="card-players" title="Este jogo é para duas pessoas">2P</span>
               </div>

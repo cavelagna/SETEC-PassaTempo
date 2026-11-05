@@ -301,6 +301,37 @@ const Snake = (() => {
     canvas.focus();
   }
 
+  function getSaveState() {
+    if (!container || !['ready', 'running'].includes(gameState)) return null;
+    return { snake, direction, nextDir, food, score, gameState, cols, rows };
+  }
+
+  function restoreSaveState(saved) {
+    const validDirection = value => value && Number.isInteger(value.x) && Number.isInteger(value.y) &&
+      Math.abs(value.x) + Math.abs(value.y) === 1;
+    if (!saved || !Array.isArray(saved.snake) || !saved.snake.length ||
+      !saved.snake.every(segment => Number.isInteger(segment.x) && Number.isInteger(segment.y) && segment.x >= 0 && segment.x < cols && segment.y >= 0 && segment.y < rows) ||
+      !validDirection(saved.direction) || !validDirection(saved.nextDir) ||
+      !saved.food || !Number.isInteger(saved.food.x) || !Number.isInteger(saved.food.y) ||
+      saved.food.x < 0 || saved.food.x >= cols || saved.food.y < 0 || saved.food.y >= rows ||
+      saved.snake.some(segment => segment.x === saved.food.x && segment.y === saved.food.y) ||
+      !Number.isSafeInteger(saved.score) || saved.score < 0 ||
+      !['ready', 'running'].includes(saved.gameState) || saved.cols !== cols || saved.rows !== rows) return false;
+
+    clearInterval(intervalId);
+    snake = saved.snake.map(segment => ({ ...segment }));
+    direction = { ...saved.direction };
+    nextDir = { ...saved.nextDir };
+    food = { ...saved.food };
+    score = saved.score;
+    gameState = saved.gameState;
+    updateScore();
+    updateStartButton();
+    draw();
+    if (gameState === 'running') intervalId = setInterval(tick, SPEED);
+    return true;
+  }
+
   function unmount() {
     clearInterval(intervalId);
     document.removeEventListener('keydown', handleKey);
@@ -310,5 +341,5 @@ const Snake = (() => {
     ctx    = null;
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

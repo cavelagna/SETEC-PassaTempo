@@ -55,7 +55,46 @@ const Solitaire = (() => {
     if (state.selected && (zone === 'tableau' || zone === 'foundation') && move(state.selected, zone, pile)) { render(); return; }
     state.selected = source(zone, pile, index); render();
   }
+
+  function getSaveState() {
+    if (!container || state.won) return null;
+    return {
+      stock: state.stock,
+      waste: state.waste,
+      tableau: state.tableau,
+      foundations: state.foundations,
+      selected: state.selected && { zone: state.selected.zone, pile: state.selected.pile, index: state.selected.index },
+    };
+  }
+
+  function restoreSaveState(saved) {
+    const validCard = card => card && SUITS.some(suit => suit.id === card.suit?.id) &&
+      RANKS.includes(card.rank) && typeof card.faceUp === 'boolean';
+    if (!saved || !Array.isArray(saved.stock) || !Array.isArray(saved.waste) ||
+      !Array.isArray(saved.tableau) || saved.tableau.length !== 7 ||
+      !Array.isArray(saved.foundations) || saved.foundations.length !== 4 ||
+      ![...saved.stock, ...saved.waste, ...saved.tableau.flat(), ...saved.foundations.flat()].every(validCard)) return false;
+    const cards = [...saved.stock, ...saved.waste, ...saved.tableau.flat(), ...saved.foundations.flat()];
+    if (cards.length !== 52 || new Set(cards.map(card => `${card.suit.id}:${card.rank}`)).size !== 52) return false;
+
+    const copyCards = list => list.map(card => ({ ...card, suit: SUITS.find(suit => suit.id === card.suit.id) }));
+    state = {
+      stock: copyCards(saved.stock),
+      waste: copyCards(saved.waste),
+      tableau: saved.tableau.map(copyCards),
+      foundations: saved.foundations.map(copyCards),
+      selected: null,
+      won: false,
+    };
+    const selection = saved.selected;
+    if (selection && ['waste', 'tableau', 'foundation'].includes(selection.zone)) {
+      state.selected = source(selection.zone, Number(selection.pile), Number(selection.index));
+    }
+    render();
+    return true;
+  }
+
   function mount(el) { container = el; newGame(); render(); container.addEventListener('click', click); }
   function unmount() { if (container) { container.removeEventListener('click', click); container.innerHTML = ''; } container = null; state = null; }
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

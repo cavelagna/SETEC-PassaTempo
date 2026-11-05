@@ -62,6 +62,8 @@ const Checkers = (() => {
       board: board.map(row => row.map(cell => (cell ? { ...cell } : null))),
       turn,
       mustCapture,
+      chainLocked,
+      selected,
       gameOver,
     };
   }
@@ -71,9 +73,45 @@ const Checkers = (() => {
     turn = state.turn;
     mustCapture = state.mustCapture;
     gameOver = state.gameOver;
-    chainLocked = false;
-    selected = -1;
-    moves = [];
+    chainLocked = !!state.chainLocked;
+    selected = Number.isInteger(state.selected) ? state.selected : -1;
+    moves = selected >= 0
+      ? (chainLocked ? stepsFor(Math.floor(selected / SIZE), selected % SIZE).filter(step => step.capture)
+        : stepsFrom(Math.floor(selected / SIZE), selected % SIZE))
+      : [];
+  }
+
+  function getSaveState() {
+    return container && !gameOver ? {
+      ...snapshot(),
+      undoStack: undoStack.map(item => ({
+        ...item,
+        board: item.board.map(row => row.map(cell => (cell ? { ...cell } : null))),
+      })),
+    } : null;
+  }
+
+  function restoreSaveState(saved) {
+    const validBoard = value => Array.isArray(value) && value.length === SIZE && value.every(row =>
+      Array.isArray(row) && row.length === SIZE && row.every(piece => piece === null ||
+        (piece && [LIGHT, DARK].includes(piece.player) && typeof piece.king === 'boolean')));
+    if (!saved || !validBoard(saved.board) || ![LIGHT, DARK].includes(saved.turn) ||
+      saved.gameOver !== false || typeof saved.chainLocked !== 'boolean' ||
+      typeof saved.mustCapture !== 'boolean' ||
+      !Number.isInteger(saved.selected) || saved.selected < -1 || saved.selected >= SIZE * SIZE ||
+      (saved.chainLocked && saved.selected < 0) ||
+      (saved.selected >= 0 && saved.board[Math.floor(saved.selected / SIZE)][saved.selected % SIZE]?.player !== saved.turn) ||
+      !Array.isArray(saved.undoStack) || !saved.undoStack.every(item => validBoard(item.board) && [LIGHT, DARK].includes(item.turn) &&
+        typeof item.mustCapture === 'boolean' && typeof item.chainLocked === 'boolean' && typeof item.gameOver === 'boolean' &&
+        Number.isInteger(item.selected) && item.selected >= -1 && item.selected < SIZE * SIZE)) return false;
+    restore(saved);
+    undoStack = saved.undoStack.map(item => ({
+      ...item,
+      board: item.board.map(row => row.map(cell => (cell ? { ...cell } : null))),
+    }));
+    refreshMustCapture();
+    render();
+    return true;
   }
 
   // ── Geração de movimentos ─────────────────────────────────
@@ -411,5 +449,5 @@ const Checkers = (() => {
     board = [];
   }
 
-  return { mount, unmount };
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

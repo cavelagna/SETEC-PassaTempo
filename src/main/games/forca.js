@@ -24,5 +24,15 @@ const Hangman = (() => {
   function start() { word = WORDS[Math.floor(Math.random() * WORDS.length)]; used = new Set(); misses = 0; render(); }
   function mount(el) { container = el; keyHandler = event => { const letter = event.key.toUpperCase(); if (/^[A-Z]$/.test(letter)) guess(letter); }; container.addEventListener('keydown', keyHandler); start(); }
   function unmount() { if (container && keyHandler) container.removeEventListener('keydown', keyHandler); if (container) container.innerHTML = ''; container = null; used = null; keyHandler = null; }
-  return { mount, unmount };
+  function getSaveState() { return container && word && ![...word].every(letter => used.has(letter)) && misses < 6 ? { word, used: [...used], misses } : null; }
+  function restoreSaveState(saved) {
+    if (!saved || !WORDS.includes(saved.word) || !Array.isArray(saved.used) || !saved.used.every(letter => /^[A-Z]$/.test(letter)) ||
+      new Set(saved.used).size !== saved.used.length || !Number.isInteger(saved.misses) || saved.misses < 0 || saved.misses >= 6) return false;
+    word = saved.word;
+    used = new Set(saved.used);
+    misses = saved.misses;
+    render();
+    return true;
+  }
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();

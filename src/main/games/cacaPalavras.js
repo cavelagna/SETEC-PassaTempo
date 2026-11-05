@@ -51,8 +51,6 @@ const WordSearch = (() => {
   function cellAt(row, col) { return container.querySelector(`.word-search-cell[data-row="${row}"][data-col="${col}"]`); }
 
   function render() {
-    placements = buildGrid(wordsFor(difficulty));
-    found = new Set(); start = null; current = null;
     container.innerHTML = `<div class="word-game word-search-game"><div class="word-game-intro"><p class="game-eyebrow">${LABELS[difficulty]} • ${placements.length} palavras</p><h3>Caça-Palavras</h3><p>As palavras podem estar na horizontal, vertical ou diagonal, inclusive de trás para frente. Segure o mouse e arraste pelas letras.</p></div><div class="word-search-layout"><div class="word-search-grid" style="--word-search-size:${size}" role="grid" aria-label="Grade de caça-palavras">${grid.flatMap((row, r) => row.map((letter, c) => `<button class="word-search-cell" data-row="${r}" data-col="${c}" aria-label="Linha ${r + 1}, coluna ${c + 1}, letra ${letter}">${letter}</button>`)).join('')}</div><ul class="word-list">${placements.map(item => `<li data-word="${item.word}">${item.word}</li>`).join('')}</ul></div><p class="word-feedback" role="status" aria-live="polite">Palavras encontradas: 0 de ${placements.length}</p><div class="word-game-actions"><button class="game-action-btn word-search-change-difficulty">Mudar dificuldade</button><button class="game-action-btn word-search-restart">Novo modelo</button></div></div>`;
     const gridElement = container.querySelector('.word-search-grid');
     gridElement.addEventListener('pointerdown', event => {
@@ -79,6 +77,18 @@ const WordSearch = (() => {
     gridElement.addEventListener('pointercancel', finishSelection);
     container.querySelector('.word-search-restart').addEventListener('click', () => startGame(difficulty));
     container.querySelector('.word-search-change-difficulty').addEventListener('click', difficultyScreen);
+    found.forEach(word => {
+      container.querySelector(`[data-word="${word}"]`)?.classList.add('is-found');
+    });
+    found.forEach(word => {
+      const placement = placements.find(item => item.word === word);
+      if (!placement) return;
+      [...word].forEach((_, index) => cellAt(placement.row + placement.dr * index, placement.col + placement.dc * index)?.classList.add('is-found'));
+    });
+    const feedback = container.querySelector('.word-feedback');
+    if (feedback) feedback.textContent = found.size === placements.length
+      ? 'Parabéns! Você encontrou todas as palavras.'
+      : `Palavras encontradas: ${found.size} de ${placements.length}`;
   }
 
   function previewLine() {
@@ -118,8 +128,32 @@ const WordSearch = (() => {
     container.querySelector('.word-feedback').textContent = found.size === placements.length ? 'Parabéns! Você encontrou todas as palavras.' : `Palavras encontradas: ${found.size} de ${placements.length}`;
   }
 
-  function startGame(level) { difficulty = level; size = sizeFor(level); render(); }
+  function startGame(level) { difficulty = level; size = sizeFor(level); placements = buildGrid(wordsFor(level)); found = new Set(); start = null; current = null; render(); }
   function mount(el) { container = el; difficultyScreen(); }
   function unmount() { if (container) container.innerHTML = ''; container = null; grid = null; placements = null; found = null; start = null; current = null; }
-  return { mount, unmount };
+
+  function getSaveState() {
+    if (!container || !placements || found.size === placements.length) return null;
+    return { size, difficulty, grid, placements, found: [...found] };
+  }
+
+  function restoreSaveState(saved) {
+    const expectedSize = sizeFor(saved?.difficulty);
+    if (!saved || expectedSize !== saved.size || !Array.isArray(saved.grid) || saved.grid.length !== expectedSize ||
+      !saved.grid.every(row => Array.isArray(row) && row.length === expectedSize && row.every(letter => /^[A-Z]$/.test(letter))) ||
+      !Array.isArray(saved.placements) || saved.placements.length !== LEVELS[saved.difficulty] || !Array.isArray(saved.found) ||
+      !saved.placements.every(item => WORDS.includes(item.word) && [item.row, item.col, item.dr, item.dc].every(Number.isInteger)) ||
+      !saved.found.every(word => saved.placements.some(item => item.word === word))) return false;
+    difficulty = saved.difficulty;
+    size = saved.size;
+    grid = saved.grid.map(row => [...row]);
+    placements = saved.placements.map(item => ({ ...item }));
+    found = new Set(saved.found);
+    start = null;
+    current = null;
+    render();
+    return true;
+  }
+
+  return { mount, unmount, getSaveState, restoreSaveState };
 })();
