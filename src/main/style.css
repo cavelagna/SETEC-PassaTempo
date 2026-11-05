@@ -183,7 +183,7 @@ html {
   font-size: 16px;
   scroll-behavior: smooth;
   scroll-padding-top: calc(var(--topbar-h) + var(--topbar-gap) + 2rem);
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -200,7 +200,7 @@ body {
   font-size: 1rem;
   line-height: 1.7;
   min-height: 100vh;
-  overflow-x: hidden;
+  overflow-x: clip;
   transition: background-color var(--transition), color var(--transition);
 }
 
