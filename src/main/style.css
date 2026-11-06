@@ -217,6 +217,15 @@ body::before {
     radial-gradient(480px 340px at 46% 86%, rgba(148, 124, 108, 0.10), transparent 60%);
   animation: bg-lights 26s ease-in-out infinite alternate;
 }
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: url('img/outros/logo.png') center / min(64vw, 460px) auto no-repeat;
+  opacity: 0.1;
+}
 @keyframes bg-lights {
   0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); opacity: .8; }
   50%  { transform: translate3d(2.5%, -2%, 0) rotate(3deg) scale(1.05); opacity: 1; }
@@ -239,6 +248,7 @@ body::before {
 }
 [data-theme="high-contrast"] body { background-image: none; }
 [data-theme="high-contrast"] body::before { display: none; }
+[data-theme="high-contrast"] body::after { display: none; }
 @media (prefers-reduced-motion: reduce) {
   body::before { animation: none; }
 }
